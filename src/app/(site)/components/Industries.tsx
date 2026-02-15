@@ -1,0 +1,85 @@
+import Image from "next/image";
+
+const industries = [
+  {
+    name: "Fine Dining",
+    description: "Precision equipment for Michelin-star standards.",
+    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    name: "Hotels & Resorts",
+    description: "High-volume solutions for banquets and room service.",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    name: "Cloud Kitchens",
+    description: "Space-optimized units for maximum efficiency.",
+    image: "https://images.unsplash.com/photo-1577412647305-991150c7d163?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+  },
+];
+
+const Industries = () => {
+  return (
+    <section className="py-12 md:py-20 relative overflow-hidden" style={{
+      background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 30%, #f1f5f9 100%)'
+    }}>
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23000000' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+      }} />
+      
+      <div className="absolute top-1/2 left-0 w-72 h-72 bg-gradient-to-r from-primary/5 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-slate-200/50 to-transparent rounded-full blur-3xl translate-x-1/4 translate-y-1/4 pointer-events-none" />
+      
+      <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        <div className="grid lg:grid-cols-12 gap-6 md:gap-8 items-start">
+          <div className="lg:col-span-4 text-center lg:text-left">
+            <p className="text-primary font-semibold text-xs md:text-sm uppercase tracking-wider mb-3">
+              Industries We Serve
+            </p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-2 leading-tight">
+              Tailored Solutions for
+            </h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-4 md:mb-6 leading-tight">
+              <span className="gradient-headline">Every Sector</span>
+            </h2>
+            <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
+              Whether you're running a boutique bistro or a massive hotel chain, Betterking adapts to your specific operational needs with customized equipment setups.
+            </p>
+            <button className="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors shadow-lg hover:shadow-xl">
+              See Case Studies
+            </button>
+          </div>
+
+          <div className="lg:col-span-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {industries.map((industry, index) => (
+                <div 
+                  key={index} 
+                  className="relative h-60 sm:h-80 rounded-xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300"
+                >
+                  <Image 
+                    src={industry.image} 
+                    alt={industry.name}
+                    fill 
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-1 h-6 bg-primary rounded-full" />
+                      <h3 className="font-semibold text-base md:text-lg text-white">{industry.name}</h3>
+                    </div>
+                    <p className="text-xs md:text-sm text-gray-300 pl-4">{industry.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Industries;

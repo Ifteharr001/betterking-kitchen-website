@@ -1,3 +1,7 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import Footer from "./components/Footer";
 import Header from "./components/Header";
 
 export default function SiteLayout({
@@ -5,15 +9,23 @@ export default function SiteLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
+  const shouldLightHeader = pathname.startsWith("/product/") || pathname === "/products";
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-     <Header />
+      
+      <Header 
+        lightBackground={shouldLightHeader} 
+        hideTopBar={shouldLightHeader} 
+      />
       
       <main className="flex-1">
         {children}
       </main>
 
-      <footer className="h-16 border-t">Footer Placeholder</footer>
+      <Footer />
     </div>
   );
 }

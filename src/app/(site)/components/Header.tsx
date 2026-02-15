@@ -20,6 +20,7 @@ const languages = [
 
 interface HeaderProps {
   lightBackground?: boolean;
+  hideTopBar?: boolean;
 }
 
 const Header = ({ lightBackground = false }: HeaderProps) => {
@@ -145,7 +146,7 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
             </Link>
 
             <div className={`hidden lg:flex items-center gap-8 ${isSearchOpen ? 'opacity-0 pointer-events-none w-0' : 'opacity-100 w-auto'} transition-all duration-300`}>
-              <Link href="#" className={`text-sm font-bold transition-colors ${
+              <Link href="/products" className={`text-sm font-bold transition-colors ${
                 showDarkMode ? 'text-gray-900 hover:text-primary' : 'text-white hover:text-primary'
               }`}>PRODUCTS</Link>
               <Link href="#" className={`text-sm font-bold transition-colors ${
@@ -213,7 +214,7 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 top-16 z-40">
             <div className="container mx-auto px-4 py-4 space-y-1">
-              <Link href="#" className="block py-3 px-4 text-sm font-bold text-gray-900 hover:bg-gray-50 rounded-lg">PRODUCTS</Link>
+              <Link href="/products" className="block py-3 px-4 text-sm font-bold text-gray-900 hover:bg-gray-50 rounded-lg">PRODUCTS</Link>
               <Link href="#" className="block py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg">SOLUTIONS</Link>
               <Link href="#" className="block py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg">PROJECTS</Link>
               <Link href="/track-order" className="block py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg">TRACK ORDER</Link>
