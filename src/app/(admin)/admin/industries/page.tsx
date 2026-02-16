@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { 
-  Package, 
+  Building2, 
   Plus, 
   Pencil, 
   Trash2, 
   Loader2, 
-  AlertCircle 
+  AlertCircle,
+  ImageIcon
 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,34 +35,31 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
-interface Product {
-  id: string; 
-  _id: string; 
+interface Industry {
+  _id: string;
   name: string;
-  category: string;
-  price: number | string;
+  description: string;
   image: string;
 }
 
-const AdminProducts = () => {
-  const router = useRouter();
+const AdminIndustries = () => {
   const { toast } = useToast();
-  
-  const [products, setProducts] = useState<Product[]>([]);
+  const [industries, setIndustries] = useState<Industry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteLoading, setDeleteLoading] = useState<string | null>(null); 
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
-  const fetchProducts = async () => {
+  
+  const fetchIndustries = async () => {
     try {
-      const res = await fetch("/api/admin/products", { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to fetch products");
+      const res = await fetch("/api/admin/industries", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch data");
       const data = await res.json();
-      setProducts(data);
+      setIndustries(data);
     } catch (error) {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: "Failed to load products. Please try again.",
+        description: "Failed to load industries.",
         variant: "destructive",
       });
     } finally {
@@ -71,34 +68,29 @@ const AdminProducts = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchIndustries();
   }, []);
+
 
   const handleDelete = async (id: string) => {
     try {
-      setDeleteLoading(id); 
-      
-      const res = await fetch(`/api/admin/products/${id}`, {
+      setDeleteLoading(id);
+      const res = await fetch(`/api/admin/industries/${id}`, {
         method: "DELETE",
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to delete product");
-      }
+      if (!res.ok) throw new Error("Failed to delete");
 
-      setProducts((prev) => prev.filter((p) => p.id !== id));
+      setIndustries((prev) => prev.filter((item) => item._id !== id));
       
       toast({
         title: "Success",
-        description: "Product deleted successfully.",
+        description: "Industry deleted successfully.",
       });
-
-    } catch (error: any) {
-      console.error("Delete Error:", error);
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Something went wrong.",
+        description: "Could not delete industry.",
         variant: "destructive",
       });
     } finally {
@@ -118,12 +110,12 @@ const AdminProducts = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage your product inventory</p>
+          <h1 className="text-2xl font-bold text-gray-900">Industries</h1>
+          <p className="text-gray-500 text-sm mt-1">Manage industry sectors and content</p>
         </div>
-        <Link href="/admin/products/add">
-          <Button className="gap-2 bg-primary font-bold hover:bg-primary/90 text-white border-none">
-            <Plus className="w-4 h-4 font-bold" /> Add Product
+        <Link href="/admin/industries/add">
+          <Button className="gap-2 bg-primary font-bold hover:bg-primary/90 text-white">
+            <Plus className="w-4 h-4 font-bold" /> Add New
           </Button>
         </Link>
       </div>
@@ -131,71 +123,58 @@ const AdminProducts = () => {
       <Card className="bg-white border-gray-200 shadow-sm">
         <CardHeader className="pb-3 border-b border-gray-100">
           <CardTitle className="text-base font-semibold flex items-center gap-2 text-gray-800">
-            <Package className="w-4 h-4 text-primary" /> All Products ({products.length})
+            <Building2 className="w-4 h-4 text-primary" /> All Industries ({industries.length})
           </CardTitle>
         </CardHeader>
         
         <CardContent className="p-0">
-          {products.length === 0 ? (
+          {industries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="bg-gray-100 p-3 rounded-full mb-3">
                 <AlertCircle className="w-6 h-6 text-gray-400" />
               </div>
-              <p className="text-gray-500 font-medium">No products found.</p>
-              <p className="text-xs text-gray-400 mt-1">Add a new product to get started.</p>
+              <p className="text-gray-500 font-medium">No industries found.</p>
+              <p className="text-xs text-gray-400 mt-1">Add a new industry to show on the website.</p>
             </div>
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b border-gray-100/50">
+                <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 border-b border-gray-100/30">
                   <TableHead className="w-[100px]">Image</TableHead>
-                  <TableHead>Product Details</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
+                  <TableHead>Industry Name</TableHead>
+                  <TableHead>Description</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((p) => (
-                  <TableRow key={p.id} className="hover:bg-gray-50/50 border-b border-gray-100/50">
-                    
+                {industries.map((item) => (
+                  <TableRow key={item._id} className="hover:bg-gray-50/50 border-b border-gray-100/20">
                     <TableCell>
                       <div className="h-12 w-12 rounded-md border border-gray-200 bg-gray-50 overflow-hidden flex items-center justify-center">
-                        {p.image ? (
+                        {item.image ? (
                           <img 
-                            src={p.image} 
-                            alt={p.name} 
+                            src={item.image} 
+                            alt={item.name} 
                             className="h-full w-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = "https://placehold.co/100?text=No+Image";
-                            }}
                           />
                         ) : (
-                          <Package className="h-6 w-6 text-gray-300" />
+                          <ImageIcon className="h-6 w-6 text-gray-300" />
                         )}
                       </div>
                     </TableCell>
                     
                     <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-gray-900">{p.name}</span>
-                        <span className="text-[14px] text-gray-400 font-mono  mt-0.5">ID: {p.id}</span>
-                      </div>
+                      <span className="font-semibold text-gray-900">{item.name}</span>
                     </TableCell>
                     
-                    <TableCell className="text-gray-500 capitalize">
-                      {p.category}
-                    </TableCell>
-                    
-                    <TableCell className="font-medium text-gray-900">
-                      ৳{Number(p.price).toLocaleString()}
+                    <TableCell className="text-gray-500 text-sm max-w-[250px] truncate">
+                      {item.description}
                     </TableCell>
                     
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                 
-                        <Link href={`/admin/products/edit/${p.id}`}>
-                          <Button size="sm" className="h-9 gap-1.5 bg-primary hover:bg-primary/90 text-white border-none shadow-sm">
+                        <Link href={`/admin/industries/edit/${item._id}`}>
+                          <Button size="sm" className="h-8 gap-1.5 bg-primary hover:bg-primary/90 text-white border-none shadow-sm">
                             <Pencil className="w-3.5 h-3.5" /> 
                             <span className="sr-only sm:not-sr-only">Edit</span>
                           </Button>
@@ -206,10 +185,10 @@ const AdminProducts = () => {
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              className="h-9 gap-1.5 border-red-100 text-red-500 hover:bg-red-50 hover:text-red-700 hover:border-red-200"
-                              disabled={deleteLoading === p.id}
+                              className="h-8 gap-1.5 border-red-100 text-red-500 hover:bg-red-50 hover:text-red-700 hover:border-red-200"
+                              disabled={deleteLoading === item._id}
                             >
-                              {deleteLoading === p.id ? (
+                              {deleteLoading === item._id ? (
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                               ) : (
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -221,16 +200,16 @@ const AdminProducts = () => {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                This will permanently delete <span className="font-bold text-gray-900">"{p.name}"</span> from the database. This action cannot be undone.
+                                This will permanently delete <strong>{item.name}</strong>. This action cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction 
-                                onClick={() => handleDelete(p.id)} 
+                                onClick={() => handleDelete(item._id)} 
                                 className="bg-red-600 hover:bg-red-700 text-white"
                               >
-                                {deleteLoading === p.id ? "Deleting..." : "Yes, Delete Product"}
+                                Delete
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -248,4 +227,4 @@ const AdminProducts = () => {
   );
 };
 
-export default AdminProducts;
+export default AdminIndustries;

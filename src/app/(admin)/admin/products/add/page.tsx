@@ -36,6 +36,17 @@ const iconOptions: { name: string; icon: LucideIcon }[] = [
   { name: "Snowflake", icon: Snowflake },
 ];
 
+const categories = [
+  "OVENS",
+  "MIXERS",
+  "REFRIGERATION",
+  "GRILLS",
+  "DISHWASHERS",
+  "COUNTERTOP APPLIANCES",
+  "KITCHENWARE",
+  "OTHERS"
+];
+
 const AdminAddProduct = () => {
   const router = useRouter();
   const { toast } = useToast();
@@ -62,7 +73,6 @@ const AdminAddProduct = () => {
   };
 
   const handleSubmit = async () => {
-   
     if (!formData.id || !formData.name || !formData.price || !image) {
       toast({
         title: "Missing Fields",
@@ -122,84 +132,95 @@ const AdminAddProduct = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl pb-10">
+    <div className="space-y-6 max-w-4xl pb-16">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-gray-900">Add Product</h1>
         <p className="text-muted-foreground text-sm mt-1">Add a new product to your inventory</p>
       </div>
 
       {/* Basic Info */}
-      <Card>
-        <CardHeader className="pb-4 border-b">
-          <CardTitle className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
+      <Card className="bg-white border-gray-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
             <PackagePlus className="w-4 h-4 text-primary" /> Basic Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-5 pt-6">
+        <CardContent className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Product ID <span className="text-red-500">*</span></Label>
-              <Input name="id" value={formData.id} onChange={handleInputChange} placeholder="e.g. OVEN-X200" required />
+              <Label className="text-xs font-medium text-gray-700">Product ID <span className="text-red-500">*</span></Label>
+              <Input name="id" value={formData.id} onChange={handleInputChange} placeholder="e.g. rahat-mixmaster" className="bg-white text-black border-gray-200" required />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Product Name <span className="text-red-500">*</span></Label>
-              <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="e.g. Titan MixMaster 3000" required />
+              <Label className="text-xs font-medium text-gray-700">Product Name <span className="text-red-500">*</span></Label>
+              <Input name="name" value={formData.name} onChange={handleInputChange} placeholder="e.g. Titan MixMaster 3000" className="bg-white text-black border-gray-200" required />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Category</Label>
-              <Input name="category" value={formData.category} onChange={handleInputChange} placeholder="e.g. Kitchen Appliances" />
+              <Label className="text-xs font-medium text-gray-700">Category</Label>
+              <Select 
+                value={formData.category} 
+                onValueChange={(val) => setFormData(prev => ({ ...prev, category: val }))}
+              >
+                <SelectTrigger className="bg-white text-black border-gray-200">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent className="bg-black border-gray-200 z-50">
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">Price (TK) <span className="text-red-500">*</span></Label>
-              <Input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder="e.g. 95000" required />
+              <Label className="text-xs font-medium text-gray-700">Price  <span className="text-red-500">*</span></Label>
+              <Input type="number" name="price" value={formData.price} onChange={handleInputChange} placeholder="e.g. ৳ 95,000" className="bg-white border-gray-200" required />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium">Description</Label>
-            <Textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Product description..." rows={4} />
+            <Label className="text-xs font-medium text-gray-700">Description</Label>
+            <Textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="Product description..." rows={3} className="bg-white border-gray-200" />
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-4 border-b">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
-              <Upload className="w-4 h-4 text-primary" /> Main Image <span className="text-red-500">*</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground mb-4">This image will appear on the product card.</p>
-            <ImageUpload 
-              value={image ? [image] : []} 
-              onChange={(url) => setImage(url)}
-              onRemove={() => setImage("")}
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-4 border-b">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
-              <Upload className="w-4 h-4 text-primary" /> Gallery Images
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground mb-4">Add multiple images for the product detail page.</p>
-            <ImageUpload 
-              value={gallery} 
-              onChange={(url) => setGallery((prev) => [...prev, url])}
-              onRemove={(url) => setGallery((prev) => prev.filter((img) => img !== url))}
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader className="pb-4 border-b">
-          <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Features</CardTitle>
+      {/* Main Image */}
+      <Card className="bg-white border-gray-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
+            <Upload className="w-4 h-4 text-primary" /> Main Image <span className="text-red-500">*</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 pt-6">
+        <CardContent>
+          <ImageUpload 
+            value={image ? [image] : []} 
+            onChange={(url) => setImage(url)}
+            onRemove={() => setImage("")}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Gallery Images */}
+      <Card className="bg-white border-gray-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xs font-semibold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
+            <Plus className="w-4 h-4 text-primary" /> Gallery Images
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ImageUpload 
+            value={gallery} 
+            onChange={(url) => setGallery((prev) => [...prev, url])}
+            onRemove={(url) => setGallery((prev) => prev.filter((img) => img !== url))}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Features */}
+      <Card className="bg-white border-gray-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Features</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
           {features.map((f, i) => (
             <div key={i} className="flex gap-2">
               <Input
@@ -209,7 +230,8 @@ const AdminAddProduct = () => {
                   updated[i] = e.target.value;
                   setFeatures(updated);
                 }}
-                placeholder={`Feature ${i + 1}`}
+                placeholder={`Feature ${i + 1}, e.g. 5 speed settings`}
+                className="bg-white text-black border-gray-200"
               />
               <Button 
                 variant="ghost" 
@@ -224,7 +246,7 @@ const AdminAddProduct = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            className="gap-1.5 mt-2" 
+            className="gap-1.5 mt-1 border-gray-200" 
             onClick={() => setFeatures([...features, ""])}
           >
             <Plus className="w-3.5 h-3.5" /> Add Feature
@@ -232,141 +254,153 @@ const AdminAddProduct = () => {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-4 border-b">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Specifications</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 pt-6">
-            {specs.map((s, i) => (
-              <div key={i} className="flex gap-2">
-                <Input
-                  value={s.key}
-                  onChange={(e) => {
-                    const updated = [...specs];
-                    updated[i] = { ...updated[i], key: e.target.value };
-                    setSpecs(updated);
-                  }}
-                  placeholder="Key (e.g. Power)"
-                  className="w-1/3"
-                />
-                <Input
-                  value={s.value}
-                  onChange={(e) => {
-                    const updated = [...specs];
-                    updated[i] = { ...updated[i], value: e.target.value };
-                    setSpecs(updated);
-                  }}
-                  placeholder="Value (e.g. 1500W)"
-                />
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="shrink-0 text-muted-foreground hover:text-destructive" 
-                  onClick={() => setSpecs(specs.filter((_, index) => index !== i))}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1.5 mt-2" 
-              onClick={() => setSpecs([...specs, { key: "", value: "" }])}
-            >
-              <Plus className="w-3.5 h-3.5" /> Add Spec
-            </Button>
-          </CardContent>
-        </Card>
+      {/* Specifications */}
+      <Card className="bg-white border-gray-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Specifications</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {specs.map((s, i) => (
+            <div key={i} className="flex gap-2">
+              <Input
+                value={s.key}
+                onChange={(e) => {
+                  const updated = [...specs];
+                  updated[i] = { ...updated[i], key: e.target.value };
+                  setSpecs(updated);
+                }}
+                placeholder="Key"
+                className="w-1/3 bg-white text-black border-gray-200"
+              />
+              <Input
+                value={s.value}
+                onChange={(e) => {
+                  const updated = [...specs];
+                  updated[i] = { ...updated[i], value: e.target.value };
+                  setSpecs(updated);
+                }}
+                placeholder="Value"
+                className="bg-white text-black border-gray-200"
+              />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="shrink-0 text-muted-foreground hover:text-destructive" 
+                onClick={() => setSpecs(specs.filter((_, index) => index !== i))}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1.5 mt-1 border-gray-200" 
+            onClick={() => setSpecs([...specs, { key: "", value: "" }])}
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Specification
+          </Button>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader className="pb-4 border-b">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Highlights</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 pt-6">
-            {highlights.map((h, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <Select
-                  value={h.icon}
-                  onValueChange={(val) => {
-                    const updated = [...highlights];
-                    updated[i] = { ...updated[i], icon: val };
-                    setHighlights(updated);
-                  }}
-                >
-                  <SelectTrigger className="w-[140px]">
-                    <SelectValue placeholder="Icon">
-                      {h.icon && (() => {
-                        const found = iconOptions.find((o) => o.name === h.icon);
-                        return found ? (
-                          <div className="flex items-center gap-2">
-                            <found.icon className="w-4 h-4" />
-                            <span className="truncate">{found.name}</span>
-                          </div>
-                        ) : h.icon;
-                      })()}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {iconOptions.map((opt) => (
+      {/* Highlights */}
+      <Card className="bg-white border-gray-200 shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Highlights</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {highlights.map((h, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <Select
+                value={h.icon}
+                onValueChange={(val) => {
+                  const updated = [...highlights];
+                  updated[i] = { ...updated[i], icon: val };
+                  setHighlights(updated);
+                }}
+              >
+                <SelectTrigger className="w-1/3 bg-white border-gray-200">
+                  <SelectValue placeholder="Select icon">
+                    {h.icon && (() => {
+                      const found = iconOptions.find((o) => o.name === h.icon);
+                      if (!found) return h.icon;
+                      const IconComp = found.icon;
+                      return (
+                        <span className="flex items-center gap-2">
+                          <IconComp className="w-4 h-4" />
+                          <span className="text-sm truncate">{found.name}</span>
+                        </span>
+                      );
+                    })()}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-black border-gray-200 z-50">
+                  {iconOptions.map((opt) => {
+                    const IconComp = opt.icon;
+                    return (
                       <SelectItem key={opt.name} value={opt.name}>
-                        <div className="flex items-center gap-2">
-                          <opt.icon className="w-4 h-4" />
+                        <span className="flex items-center gap-2">
+                          <IconComp className="w-4 h-4" />
                           <span>{opt.name}</span>
-                        </div>
+                        </span>
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  value={h.text}
-                  onChange={(e) => {
-                    const updated = [...highlights];
-                    updated[i] = { ...updated[i], text: e.target.value };
-                    setHighlights(updated);
-                  }}
-                  placeholder="Text (e.g. Warranty)"
-                />
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="shrink-0 text-muted-foreground hover:text-destructive" 
-                  onClick={() => setHighlights(highlights.filter((_, index) => index !== i))}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="gap-1.5 mt-2" 
-              onClick={() => setHighlights([...highlights, { icon: "", text: "" }])}
-            >
-              <Plus className="w-3.5 h-3.5" /> Add Highlight
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              <Input
+                value={h.text}
+                onChange={(e) => {
+                  const updated = [...highlights];
+                  updated[i] = { ...updated[i], text: e.target.value };
+                  setHighlights(updated);
+                }}
+                placeholder="Text, e.g. 2-year warranty"
+                className="bg-white text-black border-gray-200"
+              />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="shrink-0 text-muted-foreground hover:text-destructive" 
+                onClick={() => setHighlights(highlights.filter((_, index) => index !== i))}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1.5 mt-1 border-gray-200" 
+            onClick={() => setHighlights([...highlights, { icon: "", text: "" }])}
+          >
+            <Plus className="w-3.5 h-3.5" /> Add Highlight
+          </Button>
+        </CardContent>
+      </Card>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t md:left-64 z-10 flex justify-end gap-4">
-        <Button variant="outline" onClick={() => router.back()}>Cancel</Button>
+      <div className="flex items-center gap-4 pt-4">
         <Button 
+          type="button"
+          variant="outline" 
+          onClick={() => router.back()}
+          className="px-8 border-gray-200 text-white hover:bg-gray-50"
+        >
+          Cancel
+        </Button>
+        <Button 
+          type="button"
           size="lg" 
-          className="gap-2 px-8 bg-primary hover:bg-primary/90" 
+          className="gap-2 px-8 bg-primary hover:bg-primary/90 text-white font-bold" 
           onClick={handleSubmit}
           disabled={loading}
         >
           {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Creating...
-            </>
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <>
-              <PackagePlus className="w-4 h-4" /> Create Product
-            </>
+            <PackagePlus className="w-4 h-4" />
           )}
+          Add Product
         </Button>
       </div>
     </div>

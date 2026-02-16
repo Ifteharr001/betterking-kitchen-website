@@ -149,10 +149,10 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
               <Link href="/products" className={`text-sm font-bold transition-colors ${
                 showDarkMode ? 'text-gray-900 hover:text-primary' : 'text-white hover:text-primary'
               }`}>PRODUCTS</Link>
-              <Link href="#" className={`text-sm font-bold transition-colors ${
+              <Link href="solutions" className={`text-sm font-bold transition-colors ${
                 showDarkMode ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-primary'
               }`}>SOLUTIONS</Link>
-              <Link href="#" className={`text-sm font-bold transition-colors ${
+              <Link href="/projects" className={`text-sm font-bold transition-colors ${
                 showDarkMode ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-primary'
               }`}>PROJECTS</Link>
               <Link href="/track-order" className={`text-sm font-bold transition-colors ${

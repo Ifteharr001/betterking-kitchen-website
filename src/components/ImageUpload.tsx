@@ -48,7 +48,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       </div>
       
       <CldUploadWidget 
-        uploadPreset="admin_uploads" 
+        uploadPreset="qto18fm0" 
         onSuccess={onUpload}
       >
         {({ open }) => {

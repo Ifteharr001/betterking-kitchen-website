@@ -28,9 +28,10 @@ import {
 const navItems = [
   { title: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Products", path: "/admin/products", icon: Package },
-  { title: "Add Product", path: "/admin/add-product", icon: PackagePlus },
+  { title: "Add Product", path: "/admin/products/add", icon: PackagePlus },
   { title: "Quotes", path: "/admin/quotes", icon: FileText },
   { title: "Orders", path: "/admin/orders", icon: ShoppingCart },
+  { title: "Industries & Projects", path: "/admin/industries", icon: ChefHat },
 ];
 
 interface AdminSidebarProps {

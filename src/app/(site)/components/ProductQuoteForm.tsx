@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import Image from "next/image"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ interface ProductQuoteFormProps {
 
 const ProductQuoteForm = ({ productName, productImage, onClose }: ProductQuoteFormProps) => {
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   
   const [formData, setFormData] = useState({
@@ -55,31 +56,66 @@ const ProductQuoteForm = ({ productName, productImage, onClose }: ProductQuoteFo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    // Future Logic:
-    
-    toast({
-      title: "Quote Request Submitted!",
-      description: "Our team will contact you within 24 hours.",
-    });
-    
-    if (onClose) onClose();
-    
-    // Reset Form
-    setFormData({
-      name: "",
-      email: "",
-      mobile: "",
-      companyName: "",
-      businessType: "",
-      hotelStarRating: "",
-      kitchenSize: "",
-      seatingCapacity: "",
-      openingDate: "",
-      dailyProduction: "",
-      message: ""
-    });
-    setSelectedImage(null);
+    try {
+      const data = new FormData();
+      
+      Object.entries(formData).forEach(([key, value]) => {
+        data.append(key, value);
+      });
+
+      data.append("productName", productName);
+      const prodImgStr = typeof productImage === 'string' ? productImage : (productImage as any).src || "";
+      data.append("productImage", prodImgStr);
+
+      if (selectedImage) {
+        data.append("file", selectedImage);
+      }
+
+      // API কল
+      const res = await fetch("/api/quote", {
+        method: "POST",
+        body: data,
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) throw new Error(result.error || "Failed to submit quote");
+
+      toast({
+        title: "Quote Submitted Successfully!",
+        description: `Your Tracking ID: ${result.orderId}. Save this ID to track status.`,
+        duration: 6000,
+      });
+      
+      setFormData({
+        name: "",
+        email: "",
+        mobile: "",
+        companyName: "",
+        businessType: "",
+        hotelStarRating: "",
+        kitchenSize: "",
+        seatingCapacity: "",
+        openingDate: "",
+        dailyProduction: "",
+        message: ""
+      });
+      setSelectedImage(null);
+
+      if (onClose) onClose();
+
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        title: "Submission Failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -166,7 +202,7 @@ const ProductQuoteForm = ({ productName, productImage, onClose }: ProductQuoteFo
               <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                 <SelectValue placeholder="Select business type" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-gray-200">
+              <SelectContent className="bg-black border-gray-200">
                 <SelectItem value="hotel">Hotel</SelectItem>
                 <SelectItem value="restaurant">Restaurant</SelectItem>
                 <SelectItem value="cafe">Cafe</SelectItem>
@@ -183,7 +219,7 @@ const ProductQuoteForm = ({ productName, productImage, onClose }: ProductQuoteFo
               <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                 <SelectValue placeholder="Select rating" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-gray-200">
+              <SelectContent className="bg-black border-gray-200">
                 <SelectItem value="1-star">1 Star</SelectItem>
                 <SelectItem value="2-star">2 Star</SelectItem>
                 <SelectItem value="3-star">3 Star</SelectItem>
@@ -203,7 +239,7 @@ const ProductQuoteForm = ({ productName, productImage, onClose }: ProductQuoteFo
               <SelectTrigger className="bg-white border-gray-300 text-gray-900">
                 <SelectValue placeholder="Select kitchen size" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-gray-200">
+              <SelectContent className="bg-black border-gray-200">
                 <SelectItem value="small">Small (Under 500 sq ft)</SelectItem>
                 <SelectItem value="medium">Medium (500-1000 sq ft)</SelectItem>
                 <SelectItem value="large">Large (1000-2000 sq ft)</SelectItem>
@@ -301,8 +337,14 @@ const ProductQuoteForm = ({ productName, productImage, onClose }: ProductQuoteFo
         />
       </div>
 
-      <Button type="submit" className="w-full btn-gold py-6 text-base font-semibold">
-        Submit Quote Request
+      <Button type="submit" className="w-full btn-gold py-6 text-base font-semibold" disabled={loading}>
+        {loading ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting...
+          </>
+        ) : (
+          "Submit Quote Request"
+        )}
       </Button>
     </form>
   );

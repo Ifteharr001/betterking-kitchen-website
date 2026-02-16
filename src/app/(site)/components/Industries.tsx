@@ -1,24 +1,26 @@
 import Image from "next/image";
+import Link from "next/link";
+import connectDB from "@/lib/db";
+import IndustryModel from "@/models/Industry";
 
-const industries = [
-  {
-    name: "Fine Dining",
-    description: "Precision equipment for Michelin-star standards.",
-    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    name: "Hotels & Resorts",
-    description: "High-volume solutions for banquets and room service.",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    name: "Cloud Kitchens",
-    description: "Space-optimized units for maximum efficiency.",
-    image: "https://images.unsplash.com/photo-1577412647305-991150c7d163?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  },
-];
+// ডাটা ফেচিং ফাংশন
+async function getIndustries() {
+  try {
+    await connectDB();
+    const industries = await IndustryModel.find({}).lean();
+    return industries.map((ind: any) => ({
+      ...ind,
+      _id: ind._id.toString(),
+    }));
+  } catch (error) {
+    console.error("Error fetching industries:", error);
+    return [];
+  }
+}
 
-const Industries = () => {
+const Industries = async () => {
+  const industries = await getIndustries();
+
   return (
     <section className="py-12 md:py-20 relative overflow-hidden" style={{
       background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 30%, #f1f5f9 100%)'
@@ -52,28 +54,37 @@ const Industries = () => {
 
           <div className="lg:col-span-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {industries.map((industry, index) => (
-                <div 
-                  key={index} 
-                  className="relative h-60 sm:h-80 rounded-xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300"
-                >
-                  <Image 
-                    src={industry.image} 
-                    alt={industry.name}
-                    fill 
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-1 h-6 bg-primary rounded-full" />
-                      <h3 className="font-semibold text-base md:text-lg text-white">{industry.name}</h3>
+              {industries.length > 0 ? (
+                industries.map((industry: any) => (
+                  <Link 
+                    href={`/industries/${industry._id}`} 
+                    key={industry._id}
+                    className="block"
+                  >
+                    <div className="relative h-60 sm:h-80 rounded-xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300">
+                      <Image 
+                        src={industry.image} 
+                        alt={industry.name}
+                        fill 
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-1 h-6 bg-primary rounded-full" />
+                          <h3 className="font-semibold text-base md:text-lg text-white">{industry.name}</h3>
+                        </div>
+                        <p className="text-xs md:text-sm text-gray-300 pl-4">{industry.description}</p>
+                      </div>
                     </div>
-                    <p className="text-xs md:text-sm text-gray-300 pl-4">{industry.description}</p>
-                  </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-10 text-gray-500">
+                  No industries added yet. Check back soon.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

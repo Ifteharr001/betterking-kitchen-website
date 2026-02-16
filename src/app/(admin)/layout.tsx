@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AdminSidebar from "./components/AdminSidebar";
+import { Providers } from "@/components/Providers";
 
 export default function AdminLayout({
   children,
@@ -12,6 +13,7 @@ export default function AdminLayout({
 
 
   return (
+    <Providers>
       <div className="flex min-h-screen bg-gray-50 w-full">
       
         <AdminSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
@@ -21,9 +23,12 @@ export default function AdminLayout({
             collapsed ? "ml-20" : "ml-64" 
           }`}
         >
-          {children} 
+          
+       {children}
+    
         </main>
       </div>
+      </Providers>
     // </AdminProvider>
   );
 }

@@ -23,10 +23,11 @@ const AdminLogin = () => {
 
     try {
       const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false, 
-      });
+  email,
+  password,
+  redirect: true, 
+  callbackUrl: "/admin/dashboard",
+});
 
       if (result?.error) {
         toast({
