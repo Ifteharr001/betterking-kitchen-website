@@ -83,9 +83,7 @@ const ProductGrid = async () => {
                   <h3 className="font-semibold text-gray-900 text-xs md:text-sm leading-snug group-hover:text-[#D4AF37] transition-colors line-clamp-2">
                     {product.name}
                   </h3>
-                  <p className="text-gray-600 font-bold mt-2 text-sm">
-                    ৳ {Number(product.price).toLocaleString()}
-                  </p>
+                 
                 </div>
 
                 <div className="px-3 md:px-4 pb-3 md:pb-4 mt-auto bg-white">

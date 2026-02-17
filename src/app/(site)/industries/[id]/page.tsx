@@ -31,10 +31,10 @@ export default async function IndustryDetails({ params }: { params: Promise<{ id
             />
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 text-gray-900">{industry.name}</h1>
-          <p className="text-xl text-gray-500 mb-8 border-l-4 border-primary pl-4">{industry.description}</p>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 text-gray-100">{industry.name}</h1>
+          <p className="text-xl text-gray-300 mb-8 border-l-4 border-primary pl-4">{industry.description}</p>
 
-          <div className="prose prose-lg max-w-none text-gray-700">
+          <div className="prose prose-lg max-w-none text-gray-200">
             <p className="whitespace-pre-line">{industry.details || "More details coming soon..."}</p>
           </div>
         </div>

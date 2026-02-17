@@ -3,6 +3,8 @@
 import { Phone, Mail, Facebook, Twitter, Instagram, Linkedin, Globe, Search, ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +32,7 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   const [isMounted, setIsMounted] = useState(false);
+  const pathname = usePathname();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const showDarkMode = lightBackground || isScrolled || mobileMenuOpen;
@@ -59,9 +62,25 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
       searchInputRef.current.focus();
     }
   }, [isSearchOpen]);
+
+  const getLinkClass = (path: string) => {
+    const isActive = pathname === path;
+    if (showDarkMode) {
+      return isActive ? "text-primary" : "text-gray-700 hover:text-primary";
+    }
+    return isActive ? "text-primary" : "text-white/90 hover:text-primary";
+  };
+
+  const getMobileLinkClass = (path: string) => {
+    const isActive = pathname === path;
+    return isActive 
+      ? "block py-3 px-4 text-sm font-bold text-primary bg-gray-50 rounded-lg"
+      : "block py-3 px-4 text-sm font-bold text-gray-700 hover:text-primary hover:bg-gray-50 rounded-lg";
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      {/* Top bar */}
+    
       {!lightBackground && (
         <div 
           className={`transition-all duration-300 overflow-hidden hidden md:block ${
@@ -72,7 +91,7 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
             <div className="container mx-auto px-4 lg:px-8">
               <div className="flex items-center justify-between h-10 text-sm">
                 <div className="flex items-center gap-6">
-                  {/* Phone & Mail Links... */}
+                 
                   <a href="tel:+18005550123" className="flex items-center gap-2 text-white hover:text-primary transition-colors">
                     <Phone className="w-3.5 h-3.5" />
                     <span>+1 (800) 555-0123</span>
@@ -83,7 +102,6 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
                   </a>
                 </div>
                 <div className="flex items-center gap-4">
-                  {/* Social Icons... */}
                   <div className="flex items-center gap-3">
                     <a href="#" className="text-white hover:text-primary transition-colors"><Facebook className="w-4 h-4" /></a>
                     <a href="#" className="text-white hover:text-primary transition-colors"><Twitter className="w-4 h-4" /></a>
@@ -118,7 +136,6 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
                       <ChevronDown className="w-3 h-3" />
                     </div>
                   )}
-                  {/* ---------------------------------------- */}
                   
                 </div>
               </div>
@@ -131,39 +148,49 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
       <nav className={`transition-all duration-300 ${
         showDarkMode ? 'bg-white shadow-md' : 'bg-transparent'
       }`}>
-         
+          
          <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20"> 
             
-            {/* Logo */}
-            <Link href="/" className={`flex items-center gap-2 ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
-              <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-                <span className="font-bold text-primary-foreground text-lg">B</span>
+            <Link href="/" className={`flex items-center ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
+              <div className="relative h-12 w-40">
+                <Image 
+                   src={showDarkMode ? "/black-logo.png" : "/white-logo.png"}
+                   alt="BetterKing Logo"
+                   fill
+                   className="object-contain object-left"
+                   priority
+                />
               </div>
-              <span className={`font-bold text-xl tracking-tight transition-colors ${
-                showDarkMode ? 'text-gray-900' : 'text-white'
-              }`}>BETTERKING</span>
             </Link>
 
             <div className={`hidden lg:flex items-center gap-8 ${isSearchOpen ? 'opacity-0 pointer-events-none w-0' : 'opacity-100 w-auto'} transition-all duration-300`}>
-              <Link href="/products" className={`text-sm font-bold transition-colors ${
-                showDarkMode ? 'text-gray-900 hover:text-primary' : 'text-white hover:text-primary'
-              }`}>PRODUCTS</Link>
-              <Link href="solutions" className={`text-sm font-bold transition-colors ${
-                showDarkMode ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-primary'
-              }`}>SOLUTIONS</Link>
-              <Link href="/projects" className={`text-sm font-bold transition-colors ${
-                showDarkMode ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-primary'
-              }`}>PROJECTS</Link>
-              <Link href="/track-order" className={`text-sm font-bold transition-colors ${
-                showDarkMode ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-primary'
-              }`}>TRACK ORDER</Link>
-              <Link href="#" className={`text-sm font-bold transition-colors ${
-                showDarkMode ? 'text-gray-700 hover:text-primary' : 'text-white/90 hover:text-primary'
-              }`}>CONTACT</Link>
+              <Link href="/" className={`text-sm font-bold transition-colors ${getLinkClass("/")}`}>
+                HOME
+              </Link>
+              <Link href="/products" className={`text-sm font-bold transition-colors ${getLinkClass("/products")}`}>
+                PRODUCTS
+              </Link>
+              <Link href="/solutions" className={`text-sm font-bold transition-colors ${getLinkClass("/solutions")}`}>
+                SOLUTIONS
+              </Link>
+              <Link href="/projects" className={`text-sm font-bold transition-colors ${getLinkClass("/projects")}`}>
+                PROJECTS
+              </Link>
+              <Link href="/news" className={`text-sm font-bold transition-colors ${getLinkClass("/news")}`}>
+                NEWS & BLOGS
+              </Link>
+              <Link href="/track-order" className={`text-sm font-bold transition-colors ${getLinkClass("/track-order")}`}>
+                TRACK ORDER
+              </Link>
+              <Link href="/about" className={`text-sm font-bold transition-colors ${getLinkClass("/about")}`}>
+                ABOUT
+              </Link>
+              <Link href="/contact" className={`text-sm font-bold transition-colors ${getLinkClass("/contact")}`}>
+                CONTACT
+              </Link>
             </div>
 
-            {/* Right side */}
             <div className="flex items-center gap-3 justify-end flex-1 lg:flex-none">
               <div className={`flex items-center transition-all duration-300 ${
                 isSearchOpen ? 'w-full md:w-64 bg-gray-100 rounded-full px-3 py-1' : 'w-8'
@@ -212,13 +239,16 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
         </div>
 
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 top-16 z-40">
+          <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 top-20 z-40">
             <div className="container mx-auto px-4 py-4 space-y-1">
-              <Link href="/products" className="block py-3 px-4 text-sm font-bold text-gray-900 hover:bg-gray-50 rounded-lg">PRODUCTS</Link>
-              <Link href="#" className="block py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg">SOLUTIONS</Link>
-              <Link href="#" className="block py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg">PROJECTS</Link>
-              <Link href="/track-order" className="block py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg">TRACK ORDER</Link>
-              <Link href="#" className="block py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 rounded-lg">CONTACT</Link>
+              <Link href="/" className={getMobileLinkClass("/")}>HOME</Link>
+              <Link href="/products" className={getMobileLinkClass("/products")}>PRODUCTS</Link>
+              <Link href="/solutions" className={getMobileLinkClass("/solutions")}>SOLUTIONS</Link>
+              <Link href="/projects" className={getMobileLinkClass("/projects")}>PROJECTS</Link>
+              <Link href="/news" className={getMobileLinkClass("/news")}>NEWS & BLOGS</Link>
+              <Link href="/track-order" className={getMobileLinkClass("/track-order")}>TRACK ORDER</Link>
+              <Link href="/contact" className={getMobileLinkClass("/contact")}>CONTACT</Link>
+              
               <div className="pt-3 px-4">
                 <button className="btn-gold w-full">Get Quote</button>
               </div>

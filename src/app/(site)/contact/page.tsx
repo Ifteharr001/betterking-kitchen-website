@@ -153,9 +153,9 @@ const Contact = () => {
                     <h3 className="font-semibold text-gray-900">Corporate Office</h3>
                   </div>
                   <p className="text-sm text-gray-500 leading-relaxed">
-                    1234 Kitchen Lane, Culinary District<br />
-                    New York, NY 10001<br />
-                    United States
+                    Min Hang Qu, Shang Hai Shi<br />
+                    6111 Zhongchun Rd<br />
+                    China, 201100
                   </p>
                 </div>
               </div>

@@ -1,39 +1,11 @@
-
 import { ChevronRight, MapPin, Calendar, Award, Users, Building2, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import connectDB from "@/lib/db";
 import Industry from "@/models/Industry";
+import Blog from "@/models/Blog"; 
 
-const featuredProjects = [
-  {
-    title: "The Grand Marriott Kitchen",
-    location: "New York, USA",
-    category: "Hotel & Resort",
-    year: "2024",
-    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
-    description: "Complete commercial kitchen overhaul for a 500-room luxury hotel, featuring state-of-the-art cooking stations and refrigeration systems.",
-  },
-  {
-    title: "Peninsula Fine Dining",
-    location: "Hong Kong",
-    category: "Restaurant",
-    year: "2024",
-    image: "https://images.unsplash.com/photo-1571167366136-b57e07761625?w=800&q=80",
-    description: "Designed and equipped a Michelin-star fine dining kitchen with precision cooking equipment and custom ventilation.",
-  },
-  {
-    title: "Hilton Convention Center",
-    location: "London, UK",
-    category: "Convention & Events",
-    year: "2023",
-    image: "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=800&q=80",
-    description: "Large-scale banquet kitchen installation serving 2,000+ guests daily with industrial-grade equipment.",
-  },
-];
-
-// ২. Stats (Static)
 const stats = [
   { value: "500+", label: "Projects Completed", icon: Award },
   { value: "50+", label: "Countries Worldwide", icon: MapPin },
@@ -41,7 +13,6 @@ const stats = [
   { value: "15+", label: "Years Experience", icon: Calendar },
 ];
 
-// ৩. Testimonials (Static)
 const testimonials = [
   {
     quote: "Betterking transformed our kitchen into a world-class culinary workspace. The attention to detail and quality of equipment exceeded our expectations.",
@@ -63,6 +34,21 @@ const testimonials = [
   },
 ];
 
+async function getFeaturedBlogs() {
+  try {
+    await connectDB();
+    const blogs = await Blog.find({}).sort({ createdAt: -1 }).limit(3).lean();
+    return blogs.map((blog: any) => ({
+      ...blog,
+      _id: blog._id.toString(),
+      year: blog.createdAt ? new Date(blog.createdAt).getFullYear().toString() : "2024",
+    }));
+  } catch (error) {
+    console.error("Error fetching featured blogs:", error);
+    return [];
+  }
+}
+
 async function getMoreProjects() {
   try {
     await connectDB();
@@ -78,6 +64,7 @@ async function getMoreProjects() {
 }
 
 const Projects = async () => {
+  const featuredBlogs = await getFeaturedBlogs();
   const moreProjects = await getMoreProjects();
 
   return (
@@ -99,7 +86,7 @@ const Projects = async () => {
           </div>
         </section>
 
-        {/* Featured Projects - White */}
+        {/* Our Finest Work Section - Now Showing Dynamic Blogs */}
         <section className="bg-white">
           <div className="container mx-auto px-4 lg:px-8 py-16 md:py-24">
             <div className="text-center mb-12">
@@ -109,32 +96,53 @@ const Projects = async () => {
             </div>
 
             <div className="space-y-8 md:space-y-12">
-              {featuredProjects.map((project, i) => (
-                <div key={i} className={`grid md:grid-cols-2 gap-6 md:gap-10 items-center ${i % 2 === 1 ? "md:direction-rtl" : ""}`}>
-                  <div className={`rounded-2xl overflow-hidden border border-gray-100 shadow-sm ${i % 2 === 1 ? "md:order-2" : ""}`}>
-                    <div className="relative w-full h-64 md:h-80">
-                      <Image 
-                        src={project.image} 
-                        alt={project.title} 
-                        fill
-                        className="object-cover hover:scale-105 transition-transform duration-700" 
-                      />
+              {featuredBlogs.length > 0 ? (
+                featuredBlogs.map((blog: any, i: number) => (
+                  <div key={blog._id} className={`grid md:grid-cols-2 gap-6 md:gap-10 items-center ${i % 2 === 1 ? "md:flex-row-reverse" : ""}`}>
+                    {/* Image Side */}
+                    <div className={`rounded-2xl overflow-hidden border border-gray-100 shadow-sm ${i % 2 === 1 ? "md:order-2" : ""}`}>
+                      <div className="relative w-full h-64 md:h-80">
+                        <Image 
+                          src={blog.image} 
+                          alt={blog.title} 
+                          fill
+                          className="object-cover hover:scale-105 transition-transform duration-700" 
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Content Side */}
+                    <div className={i % 2 === 1 ? "md:order-1" : ""}>
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider bg-primary/10 text-primary px-3 py-1 rounded-full">
+                          {blog.category}
+                        </span>
+                        <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {blog.year}
+                        </span>
+                      </div>
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{blog.title}</h3>
+                      <p className="text-sm text-gray-400 flex items-center gap-1 mb-4">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {blog.location || "Global"}
+                      </p>
+                      <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-5 line-clamp-3">
+                        {blog.shortDesc}
+                      </p>
+                      <Link href={`/news/${blog.slug}`}>
+                        <Button variant="outline" className="gap-2 border-gray-200 text-gray-100 hover:border-primary hover:text-white">
+                          View Details <ArrowRight className="w-4 h-4" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
-                  <div className={i % 2 === 1 ? "md:order-1" : ""}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider bg-primary/10 text-primary px-3 py-1 rounded-full">{project.category}</span>
-                      <span className="text-[11px] text-gray-400 flex items-center gap-1"><Calendar className="w-3 h-3" />{project.year}</span>
-                    </div>
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">{project.title}</h3>
-                    <p className="text-sm text-gray-400 flex items-center gap-1 mb-4"><MapPin className="w-3.5 h-3.5" />{project.location}</p>
-                    <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-5">{project.description}</p>
-                    <Button variant="outline" className="gap-2 border-gray-200 text-gray-700 hover:border-primary hover:text-primary">
-                      View Details <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-10 text-gray-400 italic">
+                  No featured projects to display at the moment.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </section>
@@ -156,7 +164,7 @@ const Projects = async () => {
           </div>
         </section>
 
-        {/* More Projects (Dynamic from Industries) - White */}
+        {/* More Projects (Gallery) - White */}
         <section className="bg-white">
           <div className="container mx-auto px-4 lg:px-8 py-16 md:py-24">
             <div className="text-center mb-10">
@@ -230,9 +238,9 @@ const Projects = async () => {
                   Let's discuss how we can design and equip the perfect commercial kitchen for your business.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <a href="/contact" className="btn-gold gap-2">
+                  <Link href="/contact" className="btn-gold gap-2">
                     Get Started <ChevronRight className="w-4 h-4" />
-                  </a>
+                  </Link>
                   <a href="tel:+18005550123" className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-gray-600 text-white rounded-lg hover:border-primary hover:text-primary transition-colors text-sm font-semibold">
                     <Building2 className="w-4 h-4" /> Talk to an Expert
                   </a>

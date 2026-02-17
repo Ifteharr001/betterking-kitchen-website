@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Eye, EyeOff, Lock, Mail, ChefHat, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react";
+import Image from "next/image"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,11 +24,11 @@ const AdminLogin = () => {
 
     try {
       const result = await signIn("credentials", {
-  email,
-  password,
-  redirect: true, 
-  callbackUrl: "/admin/dashboard",
-});
+        email,
+        password,
+        redirect: true,
+        callbackUrl: "/admin/dashboard",
+      });
 
       if (result?.error) {
         toast({
@@ -54,15 +55,14 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left - Branding */}
+    <div className="fixed inset-0 z-50 w-full min-h-screen bg-background flex">
+      
       <div 
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center bg-[#0a1628]"
         style={{ 
           background: "linear-gradient(135deg, hsl(216 54% 8%) 0%, hsl(216 52% 15%) 50%, hsl(216 54% 10%) 100%)" 
         }}
       >
-        {/* Background Patterns */}
         <div className="absolute inset-0 opacity-10">
           <div 
             className="absolute top-20 left-20 w-72 h-72 rounded-full" 
@@ -75,12 +75,16 @@ const AdminLogin = () => {
         </div>
 
         <div className="relative z-10 text-center px-12">
-          <div className="w-20 h-20 mx-auto rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-8">
-            <ChefHat className="w-10 h-10 text-primary" />
+          <div className="relative w-64 h-24 mx-auto mb-6">
+            <Image 
+              src="/white-logo.png" 
+              alt="BetterKing Admin Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4">
-            <span className="text-[#D4AF37]">Better</span>King
-          </h1>
+          
           <p className="text-gray-400 text-lg max-w-md mx-auto">
             Commercial Kitchen Equipment — Admin Control Panel
           </p>
@@ -102,15 +106,19 @@ const AdminLogin = () => {
         </div>
       </div>
 
+      {/* Right - Login Form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-md">
+          {/* Mobile Logo Branding */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-14 h-14 mx-auto rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
-              <ChefHat className="w-7 h-7 text-primary" />
+            <div className="relative w-48 h-16 mx-auto mb-4">
+              <Image 
+                src="/black-logo.png" 
+                alt="BetterKing Logo"
+                fill
+                className="object-contain"
+              />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              <span className="text-primary">Better</span>King
-            </h1>
           </div>
 
           <div className="mb-8">
@@ -119,7 +127,7 @@ const AdminLogin = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-         
+          
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</Label>
               <div className="relative">
@@ -130,7 +138,7 @@ const AdminLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@betterking.com"
-                  className="pl-10 h-11 border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="pl-10 h-11 border-gray-200 text-black focus:border-primary focus:ring-1 focus:ring-primary"
                   required
                 />
               </div>
@@ -150,7 +158,7 @@ const AdminLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-10 pr-10 h-11 border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="pl-10 pr-10 h-11 border-gray-200 text-black focus:border-primary focus:ring-1 focus:ring-primary"
                   required
                 />
                 <button
@@ -179,7 +187,7 @@ const AdminLogin = () => {
             </Button>
           </form>
 
-         
+          
         </div>
       </div>
     </div>

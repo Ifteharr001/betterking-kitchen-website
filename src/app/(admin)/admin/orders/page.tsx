@@ -10,9 +10,12 @@ import {
 } from "@/components/ui/dialog";
 import { 
   ShoppingCart, Eye, Upload, FileCheck, Package, Calendar, 
-  CreditCard, Loader2, Building2, Utensils 
+  CreditCard, Loader2, Building2, Utensils, 
+  ExternalLink,
+  X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface OrderType {
   _id: string;
@@ -49,6 +52,34 @@ const paymentColors: Record<string, string> = {
 
 const allStatuses = ["pending", "processing", "shipped", "in-transit", "delivered", "cancelled"];
 
+const couriers = [
+  { 
+    name: "SF Express", 
+    url: "https://www.sf-international.com/us/en/", 
+    color: "bg-[#DC291E] hover:bg-[#b91f16]",
+    short: "SF"
+  },
+  { 
+    name: "FedEx", 
+    url: "https://www.fedex.com/en-us/tracking.html", 
+    color: "bg-[#4D148C] hover:bg-[#3b0f6b]",
+    short: "FedEx"
+  },
+  { 
+    name: "DHL", 
+    url: "https://www.dhl.com/global-en/home/tracking.html", 
+    color: "bg-[#FFCC00] hover:bg-[#e6b800] text-black", 
+    short: "DHL"
+  },
+  { 
+    name: "China Post", 
+    url: "https://www.17track.net/en",
+    color: "bg-[#003366] hover:bg-[#002244]",
+    short: "ChinaPost"
+  },
+];
+
+
 const AdminOrders = () => {
   const { toast } = useToast();
   const [orders, setOrders] = useState<OrderType[]>([]);
@@ -84,9 +115,9 @@ const AdminOrders = () => {
     fetchOrders();
   }, []);
 
-  // ২. স্ট্যাটাস আপডেট
+  
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
-    // অপটিমিস্টিক আপডেট (UI আগে আপডেট হবে)
+
     setOrders(prev => prev.map(o => o.orderId === orderId ? { ...o, status: newStatus as any } : o));
     if (selected && selected.orderId === orderId) {
       setSelected(prev => prev ? { ...prev, status: newStatus as any } : null);
@@ -104,11 +135,9 @@ const AdminOrders = () => {
       toast({ title: "Status Updated", description: `Order ${orderId} is now ${newStatus}.` });
     } catch (error) {
       toast({ title: "Error", description: "Failed to update status on server.", variant: "destructive" });
-      fetchOrders(); // রিভার্ট করার জন্য আবার ফেচ
+      fetchOrders(); 
     }
   };
-
-  // ৩. ইনভয়েস আপলোড
   const handleInvoiceUpload = async (orderId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -159,11 +188,68 @@ const AdminOrders = () => {
       </div>
 
       <Card className="bg-white border-gray-200 shadow-sm">
-        <CardHeader className="pb-3 border-b border-gray-100">
-          <CardTitle className="text-base font-semibold flex items-center gap-2 text-gray-800">
-            <ShoppingCart className="w-4 h-4 text-primary" /> All Orders ({orders.length})
-          </CardTitle>
-        </CardHeader>
+
+
+
+        <CardHeader className="pb-3 border-b border-gray-100 flex flex-row items-center justify-between">
+  {/* Left Side: Title */}
+  <CardTitle className="text-base font-semibold flex items-center gap-2 text-gray-800">
+    <ShoppingCart className="w-4 h-4 text-primary" /> 
+    All Orders ({orders.length})
+  </CardTitle>
+
+  {/* Right Side: Courier Tracking Links */}
+  <div className="flex items-center gap-2">
+    <span className="text-xs text-muted-foreground font-medium hidden sm:inline-block mr-1">
+      Track via:
+    </span>
+    
+    <TooltipProvider delayDuration={0}>
+      {couriers.map((courier) => (
+        <Tooltip key={courier.name}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`h-7 px-2.5 text-[10px] font-bold border-none text-white shadow-sm transition-all hover:scale-105 ${courier.color}`}
+              onClick={() => window.open(courier.url, "_blank")}
+            >
+              {courier.short}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="text-xs bg-gray-800 text-white border-none">
+            Track on {courier.name}
+          </TooltipContent>
+        </Tooltip>
+      ))}
+    </TooltipProvider>
+
+    {/* Universal Tracker (17Track) Button */}
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 ml-1 text-gray-500 hover:text-primary hover:bg-primary/10"
+            onClick={() => window.open("https://www.17track.net/en", "_blank")}
+          >
+            <ExternalLink className="w-4 h-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent className="text-xs">
+          Universal Tracker (17Track)
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  </div>
+</CardHeader>
+
+
+
+
+
+
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -232,117 +318,126 @@ const AdminOrders = () => {
         </CardContent>
       </Card>
 
-      {/* Order Detail Modal */}
-      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent className="sm:max-w-lg bg-white p-0 overflow-hidden">
-          {selected && (
-            <>
-              <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-                <DialogHeader>
-                  <DialogTitle className="text-lg font-bold text-gray-900">Order Details</DialogTitle>
-                  <DialogDescription className="text-xs text-gray-500">
-                    ID: <span className="font-mono text-gray-700 font-medium">#{selected.orderId}</span> • Placed on {selected.date}
-                  </DialogDescription>
-                </DialogHeader>
-              </div>
 
-              <div className="p-6 space-y-5">
-                {/* Info grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <InfoRow icon={<Package className="w-4 h-4" />} label="Customer" value={selected.customerName} />
-                  <InfoRow icon={<Calendar className="w-4 h-4" />} label="Date" value={selected.date} />
-                  <InfoRow icon={<CreditCard className="w-4 h-4" />} label="Total Amount" value={selected.total > 0 ? `৳${selected.total.toLocaleString()}` : "To Be Decided"} />
-                  <InfoRow icon={<CreditCard className="w-4 h-4" />} label="Payment Status" value={selected.paymentStatus} />
-                </div>
 
-                {/* Additional Details (from Quote) */}
-                {selected.details && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <InfoRow icon={<Building2 className="w-4 h-4" />} label="Business Type" value={selected.details.businessType || "N/A"} />
-                    <InfoRow icon={<Utensils className="w-4 h-4" />} label="Kitchen Size" value={selected.details.kitchenSize || "N/A"} />
-                  </div>
-                )}
+<Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+  <DialogContent className="sm:max-w-lg bg-white p-0 overflow-hidden">
+    {selected && (
+      <>
+        {/* Header Section */}
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 relative">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-900">Order Details</DialogTitle>
+            <DialogDescription className="text-xs text-gray-500">
+              ID: <span className="font-mono text-gray-700 font-medium">#{selected.orderId}</span> • Placed on {selected.date}
+            </DialogDescription>
+          </DialogHeader>
 
-                {/* Product Info */}
-                <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-2">Product Ordered</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-sm font-medium text-gray-900">{selected.productName}</span>
-                  </div>
-                  {selected.details?.message && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-500 italic">"{selected.details.message}"</p>
-                    </div>
-                  )}
-                </div>
+          <button 
+            onClick={() => setSelected(null)}
+            className="absolute right-4 top-4 p-2 rounded-full hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
 
-                {/* Status Control in Modal */}
-                <div className="flex items-center justify-between p-4 rounded-lg bg-blue-50/50 border border-blue-100">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-blue-600 font-bold">Current Status</p>
-                    <span className={`text-xs px-2.5 py-1 text-black rounded-full font-bold capitalize inline-block mt-1 ${statusColors[selected.status] || ""}`}>
-                      {selected.status}
-                    </span>
-                  </div>
-                  <Select
-                    value={selected.status}
-                    onValueChange={(val) => updateOrderStatus(selected.orderId, val)}
-                  >
-                    <SelectTrigger className="h-8 text-xs w-[140px] bg-white border-blue-200">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border-border z-50">
-                      {allStatuses.map((s) => (
-                        <SelectItem key={s} value={s} className="text-xs capitalize">{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+        <div className="p-6 space-y-5">
+          {/* Info grid */}
+          <div className="grid grid-cols-2 gap-3">
+            <InfoRow icon={<Package className="w-4 h-4" />} label="Customer" value={selected.customerName} />
+            <InfoRow icon={<Calendar className="w-4 h-4" />} label="Date" value={selected.date} />
+            <InfoRow icon={<CreditCard className="w-4 h-4" />} label="Total Amount" value={selected.total > 0 ? `৳${selected.total.toLocaleString()}` : "To Be Decided"} />
+            <InfoRow icon={<CreditCard className="w-4 h-4" />} label="Payment Status" value={selected.paymentStatus} />
+          </div>
 
-                {/* Invoice Section */}
-                <div className="pt-4 border-t border-gray-100">
-                  <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-3">Invoice Management</p>
-                  
-                  <input
-                    type="file"
-                    ref={invoiceRef}
-                    accept=".pdf,.jpg,.png,.jpeg"
-                    className="hidden"
-                    onChange={(e) => handleInvoiceUpload(selected.orderId, e)}
-                  />
-                  
-                  <div className="flex items-center gap-3">
-                    {uploading === selected.orderId ? (
-                      <Button disabled variant="outline" size="sm" className="gap-2">
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
-                      </Button>
-                    ) : selected.invoiceUrl ? (
-                      <>
-                        <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 px-3 py-1.5 rounded-md border border-green-100">
-                          <FileCheck className="w-4 h-4" /> Invoice Available
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => invoiceRef.current?.click()}>
-                            Replace
-                          </Button>
-                          <Button variant="default" size="sm" asChild className="bg-primary hover:bg-primary/90 text-white">
-                            <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">Download / View</a>
-                          </Button>
-                        </div>
-                      </>
-                    ) : (
-                      <Button variant="outline" size="sm" className="gap-2 border-dashed border-gray-300 hover:border-primary hover:bg-primary/5 hover:text-primary transition-colors w-full justify-start text-gray-500" onClick={() => invoiceRef.current?.click()}>
-                        <Upload className="w-4 h-4" /> Click to Upload Invoice (PDF/Image)
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </>
+          {/* Additional Details (from Quote) */}
+          {selected.details && (
+            <div className="grid grid-cols-2 gap-3">
+              <InfoRow icon={<Building2 className="w-4 h-4" />} label="Business Type" value={selected.details.businessType || "N/A"} />
+              <InfoRow icon={<Utensils className="w-4 h-4" />} label="Kitchen Size" value={selected.details.kitchenSize || "N/A"} />
+            </div>
           )}
-        </DialogContent>
-      </Dialog>
+
+          {/* Product Info */}
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
+            <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-2">Product Ordered</p>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-sm font-medium text-gray-900">{selected.productName}</span>
+            </div>
+            {selected.details?.message && (
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <p className="text-xs text-gray-500 italic">"{selected.details.message}"</p>
+              </div>
+            )}
+          </div>
+
+          {/* Status Control in Modal */}
+          <div className="flex items-center justify-between p-4 rounded-lg bg-blue-50/50 border border-blue-100">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-blue-600 font-bold">Current Status</p>
+              <span className={`text-xs px-2.5 py-1 text-black rounded-full font-bold capitalize inline-block mt-1 ${statusColors[selected.status] || ""}`}>
+                {selected.status}
+              </span>
+            </div>
+            <Select
+              value={selected.status}
+              onValueChange={(val) => updateOrderStatus(selected.orderId, val)}
+            >
+              <SelectTrigger className="h-8 text-xs w-[140px] text-black bg-white border-blue-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border z-50">
+                {allStatuses.map((s) => (
+                  <SelectItem key={s} value={s} className="text-xs capitalize">{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Invoice Section */}
+          <div className="pt-4 border-t border-gray-100">
+            <p className="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-3">Invoice Management</p>
+            
+            <input
+              type="file"
+              ref={invoiceRef}
+              accept=".pdf,.jpg,.png,.jpeg"
+              className="hidden"
+              onChange={(e) => handleInvoiceUpload(selected.orderId, e)}
+            />
+            
+            <div className="flex items-center gap-3">
+              {uploading === selected.orderId ? (
+                <Button disabled variant="outline" size="sm" className="gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading...
+                </Button>
+              ) : selected.invoiceUrl ? (
+                <>
+                  <div className="flex items-center gap-2 text-sm text-green-600 font-medium bg-green-50 px-3 py-1.5 rounded-md border border-green-100">
+                    <FileCheck className="w-4 h-4" /> Invoice Available
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => invoiceRef.current?.click()}>
+                      Replace
+                    </Button>
+                    <Button variant="default" size="sm" asChild className="bg-primary hover:bg-primary/90 text-white">
+                      <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">Download / View</a>
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <Button variant="outline" size="sm" className="gap-2 border-dashed border-gray-300 hover:border-primary hover:bg-primary/5 hover:text-primary transition-colors w-full justify-start text-gray-500" onClick={() => invoiceRef.current?.click()}>
+                  <Upload className="w-4 h-4" /> Click to Upload Invoice (PDF/Image)
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+  </DialogContent>
+</Dialog>
     </div>
   );
 };

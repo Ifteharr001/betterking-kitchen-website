@@ -129,7 +129,7 @@ const BeforeAfterSlider = () => {
     >
       {/* After (full) */}
       <img
-        src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=80"
+        src="https://i.ibb.co.com/v4QPffdS/220120-055.jpg"
         alt="After - Modern Kitchen"
         className="absolute inset-0 w-full h-full object-cover"
       />

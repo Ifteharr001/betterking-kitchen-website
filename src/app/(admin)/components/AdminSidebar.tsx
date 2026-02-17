@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image"; 
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { 
@@ -24,7 +25,6 @@ import {
   TooltipTrigger 
 } from "@/components/ui/tooltip";
 
-
 const navItems = [
   { title: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Products", path: "/admin/products", icon: Package },
@@ -32,6 +32,7 @@ const navItems = [
   { title: "Quotes", path: "/admin/quotes", icon: FileText },
   { title: "Orders", path: "/admin/orders", icon: ShoppingCart },
   { title: "Industries & Projects", path: "/admin/industries", icon: ChefHat },
+  { title: "News & Blog", path: "/admin/news", icon: ChefHat },
 ];
 
 interface AdminSidebarProps {
@@ -58,18 +59,16 @@ const AdminSidebar = ({ collapsed, setCollapsed }: AdminSidebarProps) => {
           {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
         </button>
 
-        <div className={cn("border-b border-border flex items-center transition-all duration-300", collapsed ? "p-4 justify-center" : "p-5")}>
-          <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-            <ChefHat className="w-5 h-5 text-primary" />
+        <div className={cn("border-b border-border flex items-center transition-all duration-300 h-[70px]", collapsed ? "justify-center" : "px-6")}>
+          <div className={cn("relative transition-all duration-300", collapsed ? "w-10 h-8" : "w-32 h-10")}>
+            <Image 
+              src="/white-logo.png" 
+              alt="BetterKing Admin" 
+              fill
+              className={cn("object-contain", collapsed ? "object-center" : "object-left")}
+              priority
+            />
           </div>
-          {!collapsed && (
-            <div className="ml-3 overflow-hidden">
-              <h2 className="text-base font-bold text-foreground leading-tight">
-                <span className="text-yellow-500">Better</span>King
-              </h2>
-              <p className="text-[10px] text-muted-foreground">Admin Panel</p>
-            </div>
-          )}
         </div>
 
         <nav className={cn("flex-1 space-y-1 transition-all duration-300 overflow-y-auto", collapsed ? "px-2 py-4" : "p-4")}>

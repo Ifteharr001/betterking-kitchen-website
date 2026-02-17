@@ -150,7 +150,7 @@ const EditIndustry = () => {
       </div>
 
       <div className="flex items-center justify-end gap-4 pt-4">
-        <Button variant="outline" onClick={() => router.back()} className="px-8 border-gray-200 text-gray-700 hover:bg-gray-50">
+        <Button variant="outline" onClick={() => router.back()} className="px-8 border-gray-200 text-gray-10 hover:bg-gray-50">
           Cancel
         </Button>
         <Button 
