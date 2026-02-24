@@ -35,17 +35,6 @@ const iconOptions: { name: string; icon: LucideIcon }[] = [
   { name: "Snowflake", icon: Snowflake },
 ];
 
-const categories = [
-  "OVENS",
-  "MIXERS",
-  "REFRIGERATION",
-  "GRILLS",
-  "DISHWASHERS",
-  "COUNTERTOP APPLIANCES",
-  "KITCHENWARE",
-  "OTHERS"
-];
-
 const AdminEditProduct = () => {
   const router = useRouter();
   const params = useParams();
@@ -54,11 +43,15 @@ const AdminEditProduct = () => {
   const [loading, setLoading] = useState(true); // ডাটা ফেচিং লোডিং
   const [saving, setSaving] = useState(false);  // সেভ লোডিং
 
+  // Dynamic Categories State
+  const [categoriesList, setCategoriesList] = useState<any[]>([]);
+  const [subCategoriesList, setSubCategoriesList] = useState<any[]>([]);
+
   const [formData, setFormData] = useState({
     id: "",
     name: "",
     category: "",
-    price: "",
+    subCategory: "", // Added Sub-Category, Removed Price
     description: "",
   });
 
@@ -71,32 +64,49 @@ const AdminEditProduct = () => {
 
   // ডাটা ফেচ করা
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`/api/admin/products/${params.id}`);
-        if (!res.ok) throw new Error("Product not found");
+        // ক্যাটাগরি এবং প্রোডাক্ট ডাটা একসাথে কল করা হচ্ছে
+        const [prodRes, catRes] = await Promise.all([
+          fetch(`/api/admin/products/${params.id}`),
+          fetch(`/api/admin/categories`)
+        ]);
+
+        if (!prodRes.ok) throw new Error("Product not found");
         
-        const data = await res.json();
+        const productData = await prodRes.json();
+        const catData = await catRes.json();
+        const fetchedCategories = catData.categories || [];
+
+        setCategoriesList(fetchedCategories);
 
         setFormData({
-          id: data.id,
-          name: data.name,
-          category: data.category,
-          price: data.price,
-          description: data.description,
+          id: productData.id,
+          name: productData.name,
+          category: productData.category || "",
+          subCategory: productData.subCategory || "",
+          description: productData.description || "",
         });
         
-        setImage(data.image);
-        setGallery(data.gallery || []);
-        setFeatures(data.features.length > 0 ? data.features : [""]);
-        setHighlights(data.highlights.length > 0 ? data.highlights : [{ icon: "", text: "" }]);
+        setImage(productData.image);
+        setGallery(productData.gallery || []);
+        setFeatures(productData.features?.length > 0 ? productData.features : [""]);
+        setHighlights(productData.highlights?.length > 0 ? productData.highlights : [{ icon: "", text: "" }]);
         
-        if (data.specifications) {
-          const specsArray = Object.entries(data.specifications).map(([key, value]) => ({
+        if (productData.specifications) {
+          const specsArray = Object.entries(productData.specifications).map(([key, value]) => ({
             key,
             value: String(value),
           }));
           setSpecs(specsArray.length > 0 ? specsArray : [{ key: "", value: "" }]);
+        }
+
+        // এডিট পেজ লোড হওয়ার পর পূর্বের ক্যাটাগরির সাব-ক্যাটাগরিগুলো লিস্টে সেট করা
+        if (productData.category) {
+          const selectedCat = fetchedCategories.find((c: any) => c._id === productData.category);
+          if (selectedCat && selectedCat.subCategories) {
+            setSubCategoriesList(selectedCat.subCategories);
+          }
         }
 
       } catch (error) {
@@ -111,7 +121,7 @@ const AdminEditProduct = () => {
       }
     };
 
-    if (params.id) fetchProduct();
+    if (params.id) fetchData();
   }, [params.id, router, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -119,8 +129,19 @@ const AdminEditProduct = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle Category Change to populate Sub-Categories
+  const handleCategoryChange = (val: string) => {
+    setFormData((prev) => ({ ...prev, category: val, subCategory: "" }));
+    const selectedCat = categoriesList.find((c) => c._id === val);
+    if (selectedCat && selectedCat.subCategories) {
+      setSubCategoriesList(selectedCat.subCategories);
+    } else {
+      setSubCategoriesList([]);
+    }
+  };
+
   const handleUpdate = async () => {
-    if (!formData.name || !formData.price || !image) {
+    if (!formData.name || !image) {
       toast({
         title: "Missing Fields",
         description: "Please fill in all required fields.",
@@ -139,7 +160,6 @@ const AdminEditProduct = () => {
 
       const payload = {
         ...formData,
-        price: Number(formData.price),
         features: features.filter((f) => f.trim() !== ""),
         specifications: formattedSpecs,
         highlights: highlights.filter((h) => h.text.trim() !== ""),
@@ -217,32 +237,42 @@ const AdminEditProduct = () => {
                 required 
               />
             </div>
+
+            {/* Dynamic Category Dropdown */}
             <div className="space-y-1.5">
               <Label className="text-xs font-medium text-gray-700">Category</Label>
               <Select 
                 value={formData.category} 
-                onValueChange={(val) => setFormData(prev => ({ ...prev, category: val }))}
+                onValueChange={handleCategoryChange}
               >
-                <SelectTrigger className=" text-black border-gray-200">
+                <SelectTrigger className="bg-white text-black border-gray-200">
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
-                <SelectContent className=" border-gray-200  z-50">
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                <SelectContent className="bg-black border-gray-200 z-50">
+                  {categoriesList.map((cat) => (
+                    <SelectItem key={cat._id} value={cat._id}>{cat.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Dynamic Sub-Category Dropdown */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-gray-700">Price  <span className="text-red-500">*</span></Label>
-              <Input 
-                type="number" 
-                name="price" 
-                value={formData.price} 
-                onChange={handleInputChange} 
-                className="bg-white text-black border-gray-200" 
-                
-              />
+              <Label className="text-xs font-medium text-gray-700">Sub-Category</Label>
+              <Select 
+                value={formData.subCategory} 
+                onValueChange={(val) => setFormData(prev => ({ ...prev, subCategory: val }))}
+                disabled={!formData.category || subCategoriesList.length === 0}
+              >
+                <SelectTrigger className="bg-white text-black border-gray-200">
+                  <SelectValue placeholder={subCategoriesList.length === 0 && formData.category ? "No Sub-categories" : "Select Sub-Category"} />
+                </SelectTrigger>
+                <SelectContent className="bg-black border-gray-200 z-50">
+                  {subCategoriesList.map((sub) => (
+                    <SelectItem key={sub._id} value={sub._id}>{sub.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="space-y-1.5">
@@ -456,7 +486,7 @@ const AdminEditProduct = () => {
           type="button"
           variant="outline" 
           onClick={() => router.back()}
-          className="px-8 border-gray-200 text-white hover:bg-gray-50"
+          className="px-8 border-gray-200 text-white hover:bg-gray-50 hover:text-black"
         >
           Cancel
         </Button>

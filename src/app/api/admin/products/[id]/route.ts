@@ -10,12 +10,15 @@ export async function PUT(
     const { id } = await params; 
     const body = await req.json();
 
+    if (body.category) body.category = body.category.toLowerCase();
+    if (body.subCategory) body.subCategory = body.subCategory.toLowerCase();
+
     await connectDB();
 
     const updatedProduct = await Product.findOneAndUpdate(
       { id: id }, 
       { $set: body },
-      { new: true, runValidators: true } 
+      { returnDocument: 'after', runValidators: true } 
     );
 
     if (!updatedProduct) {

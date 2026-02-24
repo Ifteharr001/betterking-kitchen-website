@@ -14,7 +14,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   ChefHat, 
-  User 
+  User, 
+  FolderOpen
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ import {
 
 const navItems = [
   { title: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
+  { title: "Categories", path: "/admin/categories", icon: FolderOpen },
   { title: "Products", path: "/admin/products", icon: Package },
   { title: "Add Product", path: "/admin/products/add", icon: PackagePlus },
   { title: "Quotes", path: "/admin/quotes", icon: FileText },

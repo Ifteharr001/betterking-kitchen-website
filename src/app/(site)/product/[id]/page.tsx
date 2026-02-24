@@ -33,23 +33,47 @@ const ProductDetails = ({ params }: PageProps) => {
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-useEffect(() => {
+  const [catName, setCatName] = useState<string>("");
+  const [catSlug, setCatSlug] = useState<string>("");
+  const [subCatName, setSubCatName] = useState<string>("");
+  const [subCatSlug, setSubCatSlug] = useState<string>("");
+
+  useEffect(() => {
     if (!productId) return; 
 
-    const fetchProduct = async () => {
+    const fetchProductAndCategories = async () => {
       try {
         setLoading(true);
-        console.log("Fetching for ID:", productId); 
         
-        const res = await fetch(`/api/products/${productId}`);
+        const [prodRes, catRes] = await Promise.all([
+          fetch(`/api/products/${productId}`),
+          fetch(`/api/admin/categories`)
+        ]);
         
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error || "Product not found");
+        if (!prodRes.ok) {
+          throw new Error("Product not found");
         }
         
-        const data = await res.json();
-        setProduct(data);
+        const prodData = await prodRes.json();
+        const catData = await catRes.json();
+        
+        setProduct(prodData);
+
+        if (catData.categories && prodData.category) {
+          const category = catData.categories.find((c: any) => c._id === prodData.category);
+          if (category) {
+            setCatName(category.name);
+            setCatSlug(category.slug);
+
+            if (prodData.subCategory && category.subCategories) {
+              const subCategory = category.subCategories.find((s: any) => s._id === prodData.subCategory);
+              if (subCategory) {
+                setSubCatName(subCategory.name);
+                setSubCatSlug(subCategory.slug);
+              }
+            }
+          }
+        }
       } catch (error) {
         console.error("Error fetching product:", error);
         setProduct(null);
@@ -58,8 +82,8 @@ useEffect(() => {
       }
     };
 
-    fetchProduct();
-}, [productId]);
+    fetchProductAndCategories();
+  }, [productId]);
 
   if (loading) {
     return (
@@ -92,25 +116,46 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-white">
-      
       <main className="pt-28 pb-20">
         <div className="container mx-auto px-4 lg:px-8">
-          <nav className="flex items-center gap-2 text-sm mb-8">
+          
+          <nav className="flex flex-wrap items-center gap-2 text-sm mb-8">
             <Link href="/" className="text-muted-foreground hover:text-primary transition-colors">Home</Link>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Products</span>
+            
+            <Link href="/products" className="text-muted-foreground hover:text-primary transition-colors">Products</Link>
+            
+            {catName && (
+              <>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <Link href={`/categories/${catSlug}`} className="text-muted-foreground hover:text-primary transition-colors capitalize">
+                  {catName}
+                </Link>
+              </>
+            )}
+
+            {subCatName && (
+              <>
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <Link href={`/products?category=${catSlug}&subcategory=${subCatSlug}`} className="text-muted-foreground hover:text-primary transition-colors capitalize">
+                  {subCatName}
+                </Link>
+              </>
+            )}
+
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
-            <span className="text-foreground font-medium">{product.name}</span>
+            <span className="text-foreground font-medium truncate text-gray-500 max-w-[200px] sm:max-w-full" title={product.name}>
+              {product.name}
+            </span>
           </nav>
 
-          {/* Product Hero Section */}
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
-            {/* Product Images */}
+         
             <div className="space-y-4">
-              {/* Main Image */}
+            
               <div className="relative bg-gray-50 border border-gray-200 rounded-2xl p-8 aspect-square flex items-center justify-center">
                 <span className="absolute top-4 left-4 text-xs font-bold text-white bg-primary px-3 py-1.5 rounded-full uppercase tracking-wider">
-                  {product.category}
+                  {catName || "Product"}
                 </span>
                 <Image 
                   src={productImages[selectedImageIndex]} 
@@ -120,7 +165,6 @@ useEffect(() => {
                   className="max-w-[80%] max-h-[80%] object-contain"
                 />
 
-                {/* Prev / Next arrows */}
                 {productImages.length > 1 && (
                   <>
                     <button
@@ -141,7 +185,6 @@ useEffect(() => {
                 )}
               </div>
               
-              {/* Thumbnail Gallery */}
               <div className="flex gap-3">
                 {productImages.map((img: string, index: number) => (
                   <button
@@ -165,14 +208,14 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Product Info */}
             <div className="flex flex-col">
               <div className="mb-4">
-                <p className="text-primary font-semibold text-sm tracking-wider uppercase mb-2">{product.category}</p>
+                <p className="text-primary font-semibold text-sm tracking-wider uppercase mb-2">
+                  {subCatName || catName || "Equipment"}
+                </p>
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
               </div>
 
-              {/* Rating (Static for now) */}
               <div className="flex items-center gap-3 mb-4">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -212,10 +255,9 @@ useEffect(() => {
                 </Button>
               </div>
 
-              {/* Highlights Grid (Dynamic Icons) */}
               <div className="grid grid-cols-2 gap-3">
                 {product.highlights?.map((highlight: any, index: number) => {
-                  const IconComponent = iconMap[highlight.icon] || Shield; // Default to Shield if icon not found
+                  const IconComponent = iconMap[highlight.icon] || Shield; 
                   return (
                     <div key={index} className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
                       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -247,7 +289,6 @@ useEffect(() => {
               <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6 lg:p-8">
                 <h3 className="text-xl font-bold text-gray-900 mb-6">Technical Specifications</h3>
                 <div className="space-y-0">
-                 
                   {product.specifications && Object.entries(product.specifications).map(([key, value], index, arr) => (
                     <div 
                       key={key} 
@@ -315,7 +356,6 @@ useEffect(() => {
         </div>
       </main>
 
-      {/* Quote Dialog */}
       <Dialog open={isQuoteOpen} onOpenChange={setIsQuoteOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white border-gray-200">
           <DialogHeader>

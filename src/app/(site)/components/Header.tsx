@@ -31,11 +31,30 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   
+  // Category States for Dropdown
+  const [categories, setCategories] = useState<any[]>([]);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  
   const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const showDarkMode = lightBackground || isScrolled || mobileMenuOpen;
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/admin/categories");
+        const data = await res.json();
+        if (data.categories) {
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     setIsMounted(true); 
@@ -168,9 +187,33 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
               <Link href="/" className={`text-sm font-bold transition-colors ${getLinkClass("/")}`}>
                 HOME
               </Link>
-              <Link href="/products" className={`text-sm font-bold transition-colors ${getLinkClass("/products")}`}>
-                PRODUCTS
-              </Link>
+              
+              {/* Dropdown for Products */}
+              <div className="relative group py-4">
+                <Link href="/products" className={`flex items-center gap-1 text-sm font-bold transition-colors ${getLinkClass("/products")}`}>
+                  PRODUCTS
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </Link>
+                
+                <div className="absolute left-0 top-full pt-2 hidden group-hover:block w-64 z-50">
+                  <div className="bg-white shadow-xl rounded-xl border border-gray-100 overflow-hidden py-2">
+                    {categories.length > 0 ? (
+                      categories.map((cat) => (
+                        <Link 
+                          key={cat._id} 
+                          href={`/categories/${cat.slug}`} 
+                          className="block px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-primary hover:bg-primary/5 transition-colors"
+                        >
+                          {cat.name}
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="px-5 py-3 text-sm text-gray-500">Loading categories...</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <Link href="/solutions" className={`text-sm font-bold transition-colors ${getLinkClass("/solutions")}`}>
                 SOLUTIONS
               </Link>
@@ -238,21 +281,52 @@ const Header = ({ lightBackground = false }: HeaderProps) => {
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 top-20 z-40">
-            <div className="container mx-auto px-4 py-4 space-y-1">
-              <Link href="/" className={getMobileLinkClass("/")}>HOME</Link>
-              <Link href="/products" className={getMobileLinkClass("/products")}>PRODUCTS</Link>
-              <Link href="/solutions" className={getMobileLinkClass("/solutions")}>SOLUTIONS</Link>
-              <Link href="/projects" className={getMobileLinkClass("/projects")}>PROJECTS</Link>
-              <Link href="/news" className={getMobileLinkClass("/news")}>NEWS & BLOGS</Link>
-              <Link href="/track-order" className={getMobileLinkClass("/track-order")}>TRACK ORDER</Link>
-              <Link href="/contact" className={getMobileLinkClass("/contact")}>CONTACT</Link>
+            <div className="container mx-auto px-4 py-4 space-y-1 max-h-[80vh] overflow-y-auto">
+              <Link href="/" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass("/")}>HOME</Link>
+              
+              {/* Mobile Products Dropdown */}
+              <div className="border-b border-gray-50 pb-1 mb-1">
+                <div className="flex items-center justify-between pr-2">
+                  <Link href="/products" onClick={() => setMobileMenuOpen(false)} className={`flex-1 ${getMobileLinkClass("/products")}`}>
+                    PRODUCTS
+                  </Link>
+                  <button 
+                    onClick={() => setMobileProductsOpen(!mobileProductsOpen)} 
+                    className="p-2 text-gray-500 hover:text-primary bg-gray-50 rounded-lg ml-2"
+                  >
+                    <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${mobileProductsOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+                
+                {mobileProductsOpen && (
+                  <div className="pl-4 pr-2 py-2 space-y-1 border-l-2 border-gray-100 ml-4 mb-2 mt-1">
+                    {categories.map((cat) => (
+                      <Link 
+                        key={cat._id} 
+                        href={`/categories/${cat.slug}`} 
+                        className="block py-2 px-4 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <Link href="/solutions" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass("/solutions")}>SOLUTIONS</Link>
+              <Link href="/projects" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass("/projects")}>PROJECTS</Link>
+              <Link href="/news" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass("/news")}>NEWS & BLOGS</Link>
+              <Link href="/track-order" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass("/track-order")}>TRACK ORDER</Link>
+              <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className={getMobileLinkClass("/contact")}>CONTACT</Link>
               
               <div className="pt-3 px-4">
                 <button className="btn-gold w-full">Get Quote</button>
               </div>
-              <div className="pt-3 px-4 space-y-2 border-t border-gray-100 mt-3">
+              <div className="pt-3 px-4 space-y-2 border-t border-gray-100 mt-3 pb-4">
                 <a href="tel:+18005550123" className="flex items-center gap-2 text-sm text-gray-600">
                   <Phone className="w-4 h-4 text-primary" />
                   +1 (800) 555-0123

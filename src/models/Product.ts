@@ -4,7 +4,7 @@ export interface IProduct extends Document {
   id: string;
   name: string;
   category: string;
-  price: string;
+  subCategory?: string;
   description: string;
   image: string; 
   gallery?: string[];
@@ -30,12 +30,10 @@ const ProductSchema: Schema = new Schema(
     },
     category: { 
       type: String, 
-      required: true,
-      uppercase: true
+      required: true
     },
-    price: { 
-      type: String, 
-      default: "Contact for Price" 
+    subCategory: {
+      type: String,
     },
     description: { 
       type: String, 
@@ -45,11 +43,11 @@ const ProductSchema: Schema = new Schema(
       type: String, 
       required: true 
     },
-      gallery: [
-        {
-          type: String,
-        }
-      ],
+    gallery: [
+      {
+        type: String,
+      }
+    ],
     features: [
       { 
         type: String 

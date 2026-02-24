@@ -12,7 +12,7 @@ export default function SiteLayout({
 }) {
   const pathname = usePathname();
 
-  const shouldLightHeader = pathname.startsWith("/product/") || pathname === "/products" || pathname.startsWith("/news");
+  const shouldLightHeader = pathname.startsWith("/product/") || pathname === "/products" || pathname.startsWith("/news") || pathname.startsWith("/categories");
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative">

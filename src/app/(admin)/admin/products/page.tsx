@@ -40,7 +40,7 @@ interface Product {
   _id: string; 
   name: string;
   category: string;
-  price: number | string;
+  subCategory?: string; // Price এর বদলে Sub-Category যোগ করা হয়েছে
   image: string;
 }
 
@@ -49,20 +49,32 @@ const AdminProducts = () => {
   const { toast } = useToast();
   
   const [products, setProducts] = useState<Product[]>([]);
+  const [categoriesList, setCategoriesList] = useState<any[]>([]); // ক্যাটাগরি লিস্ট সেভ রাখার জন্য
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null); 
 
-  const fetchProducts = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch("/api/admin/products", { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to fetch products");
-      const data = await res.json();
-      setProducts(data);
+      // প্রোডাক্ট এবং ক্যাটাগরি দুটোই একসাথে ফেচ করা হচ্ছে যাতে নাম দেখানো যায়
+      const [prodRes, catRes] = await Promise.all([
+        fetch("/api/admin/products", { cache: "no-store" }),
+        fetch("/api/admin/categories")
+      ]);
+
+      if (!prodRes.ok) throw new Error("Failed to fetch products");
+      
+      const prodData = await prodRes.json();
+      const catData = await catRes.json();
+      
+      setProducts(prodData);
+      if (catData.categories) {
+        setCategoriesList(catData.categories);
+      }
     } catch (error) {
       console.error("Error:", error);
       toast({
         title: "Error",
-        description: "Failed to load products. Please try again.",
+        description: "Failed to load data. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -71,7 +83,7 @@ const AdminProducts = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchData();
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -104,6 +116,22 @@ const AdminProducts = () => {
     } finally {
       setDeleteLoading(null);
     }
+  };
+  const getCategoryName = (catId: string) => {
+    if (!catId) return "-";
+    const cat = categoriesList.find((c) => c._id === catId);
+    return cat ? cat.name : catId;
+  };
+
+ const getSubCategoryName = (catId: string, subId?: string) => {
+    if (!subId) return "No Sub-category";
+    
+    const cat = categoriesList.find((c) => c._id === catId);
+    if (cat && cat.subCategories) {
+      const sub = cat.subCategories.find((s: any) => s._id === subId);
+      return sub ? sub.name : "Unknown Sub-category";
+    }
+    return "Unknown Sub-category";
   };
 
   if (loading) {
@@ -151,7 +179,7 @@ const AdminProducts = () => {
                   <TableHead className="w-[100px]">Image</TableHead>
                   <TableHead>Product Details</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
+                  <TableHead>Sub-Category</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -184,11 +212,11 @@ const AdminProducts = () => {
                     </TableCell>
                     
                     <TableCell className="text-gray-500 capitalize">
-                      {p.category}
+                      {getCategoryName(p.category)}
                     </TableCell>
                     
-                    <TableCell className="font-medium text-gray-900">
-                      ৳{Number(p.price).toLocaleString()}
+                    <TableCell className="font-medium text-gray-900 capitalize">
+                      {getSubCategoryName(p.category, p.subCategory || "")}
                     </TableCell>
                     
                     <TableCell className="text-right">
