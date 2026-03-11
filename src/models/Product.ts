@@ -2,67 +2,63 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IProduct extends Document {
   id: string;
-  name: string;
+  name: { en: string; bn: string; ar: string; es: string; zh: string; fr: string };
   category: string;
   subCategory?: string;
-  description: string;
+  description: { en: string; bn: string; ar: string; es: string; zh: string; fr: string };
   image: string; 
   gallery?: string[];
-  features: string[];
+  features: { en: string; bn: string; ar: string; es: string; zh: string; fr: string }[];
   specifications: Map<string, string>; 
   highlights: {
     icon: string;
-    text: string;
+    text: { en: string; bn: string; ar: string; es: string; zh: string; fr: string };
   }[];
 }
 
 const ProductSchema: Schema = new Schema(
   {
-    id: { 
-      type: String, 
-      required: true, 
-      unique: true,
-      index: true 
+    id: { type: String, required: true, unique: true, index: true },
+    name: {
+      en: { type: String, required: true },
+      bn: { type: String, default: "" },
+      ar: { type: String, default: "" },
+      es: { type: String, default: "" },
+      zh: { type: String, default: "" },
+      fr: { type: String, default: "" },
     },
-    name: { 
-      type: String, 
-      required: true 
+    category: { type: String, required: true },
+    subCategory: { type: String },
+    description: {
+      en: { type: String, required: true },
+      bn: { type: String, default: "" },
+      ar: { type: String, default: "" },
+      es: { type: String, default: "" },
+      zh: { type: String, default: "" },
+      fr: { type: String, default: "" },
     },
-    category: { 
-      type: String, 
-      required: true
-    },
-    subCategory: {
-      type: String,
-    },
-    description: { 
-      type: String, 
-      required: true 
-    },
-    image: { 
-      type: String, 
-      required: true 
-    },
-    gallery: [
-      {
-        type: String,
+    image: { type: String, required: true },
+    gallery: [{ type: String }],
+    features: [{
+      en: { type: String },
+      bn: { type: String, default: "" },
+      ar: { type: String, default: "" },
+      es: { type: String, default: "" },
+      zh: { type: String, default: "" },
+      fr: { type: String, default: "" },
+    }],
+    specifications: { type: Map, of: String },
+    highlights: [{
+      icon: { type: String, required: true },
+      text: {
+        en: { type: String },
+        bn: { type: String, default: "" },
+        ar: { type: String, default: "" },
+        es: { type: String, default: "" },
+        zh: { type: String, default: "" },
+        fr: { type: String, default: "" },
       }
-    ],
-    features: [
-      { 
-        type: String 
-      }
-    ],
-    specifications: {
-      type: Map,
-      of: String,
-    },
-    highlights: [
-      {
-        icon: { type: String, required: true }, 
-        text: { type: String, required: true }
-      }
-    ]
+    }]
   },
   { timestamps: true }
 );

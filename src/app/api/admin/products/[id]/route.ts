@@ -2,6 +2,31 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
 
+async function translateText(text: string, targetLang: string) {
+  if (!text) return "";
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data[0].map((item: any) => item[0]).join('');
+  } catch (error) {
+    console.error(`Error translating to ${targetLang}:`, error);
+    return "";
+  }
+}
+
+async function autoTranslate(text: string) {
+  if (!text) return { bn: "", ar: "", es: "", zh: "", fr: "" };
+  const [bn, ar, es, zh, fr] = await Promise.all([
+    translateText(text, 'bn'),
+    translateText(text, 'ar'),
+    translateText(text, 'es'),
+    translateText(text, 'zh-CN'),
+    translateText(text, 'fr')
+  ]);
+  return { bn, ar, es, zh, fr };
+}
+
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -15,9 +40,39 @@ export async function PUT(
 
     await connectDB();
 
+    let updateData: any = { ...body };
+
+    if (body.name) {
+      const transName = await autoTranslate(body.name);
+      updateData.name = { en: body.name, ...transName };
+    }
+
+    if (body.description) {
+      const transDesc = await autoTranslate(body.description);
+      updateData.description = { en: body.description, ...transDesc };
+    }
+
+    if (body.features && Array.isArray(body.features)) {
+      const transFeatures = [];
+      for (const feature of body.features) {
+        const tf = await autoTranslate(feature);
+        transFeatures.push({ en: feature, ...tf });
+      }
+      updateData.features = transFeatures;
+    }
+
+    if (body.highlights && Array.isArray(body.highlights)) {
+      const transHighlights = [];
+      for (const hl of body.highlights) {
+        const thl = await autoTranslate(hl.text);
+        transHighlights.push({ icon: hl.icon, text: { en: hl.text, ...thl } });
+      }
+      updateData.highlights = transHighlights;
+    }
+
     const updatedProduct = await Product.findOneAndUpdate(
       { id: id }, 
-      { $set: body },
+      { $set: updateData },
       { returnDocument: 'after', runValidators: true } 
     );
 
