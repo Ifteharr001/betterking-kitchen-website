@@ -46,7 +46,7 @@ export default async function Categories() {
       
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="text-center mb-8 md:mb-12">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight text-gray-900 mb-3 md:mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mt-12 tracking-tight text-gray-900 mb-3 md:mb-4">
             {t("title")}
           </h2>
           <p className="text-sm md:text-lg max-w-2xl mx-auto text-gray-600">

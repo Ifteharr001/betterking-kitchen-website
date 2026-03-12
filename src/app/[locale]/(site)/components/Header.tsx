@@ -174,7 +174,6 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                     <a href="#" className="text-white hover:text-primary transition-colors"><Linkedin className="w-4 h-4" /></a>
                   </div>
 
-                  {/* Desktop Language Selector */}
                   {isMounted && (
                     <DropdownMenu>
                       <DropdownMenuTrigger className="flex items-center gap-1.5 pl-4 border-l border-white/30 text-white hover:text-primary transition-colors cursor-pointer outline-none">
@@ -212,7 +211,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-between h-20"> 
             
-            <Link href={getLocalizedLink("/")} className={`flex items-center ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
+            <Link href={getLocalizedLink("/")} prefetch={false} className={`flex items-center ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
               <div className="relative h-12 w-40">
                 <Image 
                   src={showDarkMode ? "/black-logo.png" : "/white-logo.png"}
@@ -225,12 +224,12 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
             </Link>
 
             <div className={`hidden lg:flex items-center gap-8 ${isSearchOpen ? 'opacity-0 pointer-events-none w-0' : 'opacity-100 w-auto'} transition-all duration-300`}>
-              <Link href={getLocalizedLink("/")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/")}`}>
+              <Link href={getLocalizedLink("/")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/")}`}>
                 {t("home")}
               </Link>
               
               <div className="relative group py-4">
-                <Link href={getLocalizedLink("/products")} className={`flex items-center gap-1 text-sm font-bold transition-colors uppercase ${getLinkClass("/products")}`}>
+                <Link href={getLocalizedLink("/products")} prefetch={false} className={`flex items-center gap-1 text-sm font-bold transition-colors uppercase ${getLinkClass("/products")}`}>
                   {t("products")}
                   <ChevronDown className="w-3.5 h-3.5" />
                 </Link>
@@ -242,10 +241,11 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                       categoryChunks.map((chunk, chunkIndex) => (
                         <div 
                           key={chunkIndex} 
-                          className={`w-64 ${chunkIndex !== categoryChunks.length - 1 ? 'border-r border-gray-200' : ''}`} // 💡 Grey border between columns
+                          className={`w-64 ${chunkIndex !== categoryChunks.length - 1 ? 'border-r border-gray-200' : ''}`}
                         >
                           {chunk.map((cat: any) => (
                             <Link 
+                            prefetch={false}
                               key={cat._id} 
                               href={getLocalizedLink(`/categories/${cat.slug}`)} 
                               className="block px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-primary hover:bg-primary/5 transition-colors"
@@ -263,25 +263,25 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                 </div>
               </div>
 
-              <Link href={getLocalizedLink("/solutions")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/solutions")}`}>
+              <Link href={getLocalizedLink("/solutions")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/solutions")}`}>
                 {t("solutions")}
               </Link>
-              <Link href={getLocalizedLink("/industries")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/industries")}`}>
+              <Link href={getLocalizedLink("/industries")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/industries")}`}>
                 {t("industries")}
               </Link>
-              <Link href={getLocalizedLink("/projects")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/projects")}`}>
+              <Link href={getLocalizedLink("/projects")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/projects")}`}>
                 {t("projects")}
               </Link>
-              <Link href={getLocalizedLink("/news")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/news")}`}>
+              <Link href={getLocalizedLink("/news")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/news")}`}>
                 {t("news")}
               </Link>
-              <Link href={getLocalizedLink("/track-order")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/track-order")}`}>
+              <Link href={getLocalizedLink("/track-order")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/track-order")}`}>
                 {t("trackOrder")}
               </Link>
-              <Link href={getLocalizedLink("/about")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/about")}`}>
+              <Link href={getLocalizedLink("/about")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/about")}`}>
                 {t("about")}
               </Link>
-              <Link href={getLocalizedLink("/contact")} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/contact")}`}>
+              <Link href={getLocalizedLink("/contact")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/contact")}`}>
                 {t("contact")}
               </Link>
             </div>
@@ -344,7 +344,6 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
           <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 top-20 z-40">
             <div className="container mx-auto px-4 py-4 space-y-1 max-h-[80vh] overflow-y-auto">
               
-              {/* Mobile Language Selector */}
               <div className="pb-3 mb-2 border-b border-gray-100">
                 <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-2 px-2">Select Language</p>
                 <div className="flex flex-wrap gap-2 px-2">
@@ -364,12 +363,11 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                 </div>
               </div>
 
-              <Link href={getLocalizedLink("/")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/")} uppercase`}>{t("home")}</Link>
+              <Link href={getLocalizedLink("/")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/")} uppercase`}>{t("home")}</Link>
               
-              {/* Mobile Products Dropdown */}
               <div className="border-b border-gray-50 pb-1 mb-1">
                 <div className="flex items-center justify-between pr-2">
-                  <Link href={getLocalizedLink("/products")} onClick={() => setMobileMenuOpen(false)} className={`flex-1 uppercase ${getMobileLinkClass("/products")}`}>
+                  <Link href={getLocalizedLink("/products")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`flex-1 uppercase ${getMobileLinkClass("/products")}`}>
                     {t("products")}
                   </Link>
                   <button 
@@ -385,6 +383,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                     {categories.map((cat) => (
                       <Link 
                         key={cat._id} 
+                        prefetch={false}
                         href={getLocalizedLink(`/categories/${cat.slug}`)} 
                         className="block py-2 px-4 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
                         onClick={() => setMobileMenuOpen(false)}
@@ -396,13 +395,13 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                 )}
               </div>
 
-              <Link href={getLocalizedLink("/solutions")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/solutions")} uppercase`}>{t("solutions")}</Link>
-              <Link href={getLocalizedLink("/industries")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/industries")} uppercase`}>{t("industries")}</Link>
-              <Link href={getLocalizedLink("/projects")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/projects")} uppercase`}>{t("projects")}</Link>
-              <Link href={getLocalizedLink("/news")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/news")} uppercase`}>{t("news")}</Link>
-              <Link href={getLocalizedLink("/track-order")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/track-order")} uppercase`}>{t("trackOrder")}</Link>
-              <Link href={getLocalizedLink("/about")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/about")} uppercase`}>{t("about")}</Link>
-              <Link href={getLocalizedLink("/contact")} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/contact")} uppercase`}>{t("contact")}</Link>
+              <Link href={getLocalizedLink("/solutions")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/solutions")} uppercase`}>{t("solutions")}</Link>
+              <Link href={getLocalizedLink("/industries")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/industries")} uppercase`}>{t("industries")}</Link>
+              <Link href={getLocalizedLink("/projects")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/projects")} uppercase`}>{t("projects")}</Link>
+              <Link href={getLocalizedLink("/news")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/news")} uppercase`}>{t("news")}</Link>
+              <Link href={getLocalizedLink("/track-order")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/track-order")} uppercase`}>{t("trackOrder")}</Link>
+              <Link href={getLocalizedLink("/about")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/about")} uppercase`}>{t("about")}</Link>
+              <Link href={getLocalizedLink("/contact")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/contact")} uppercase`}>{t("contact")}</Link>
               
               <div className="pt-3 px-4">
                 <button 
