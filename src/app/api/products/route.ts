@@ -37,7 +37,12 @@ export async function GET(req: Request) {
     if (category) query = { category: category.toUpperCase() };
 
     const products = await Product.find(query).sort({ createdAt: -1 }); 
-    return NextResponse.json(products, { status: 200 });
+    const response = NextResponse.json(products.map(p => ({
+      ...p.toObject(),
+      id: p.id || p._id.toString()
+    })), { status: 200 });
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    return response;
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch products", details: error }, { status: 500 });
   }

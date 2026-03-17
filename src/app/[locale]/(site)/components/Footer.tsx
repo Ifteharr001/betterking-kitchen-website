@@ -51,7 +51,7 @@ const Footer = async () => {
             </p>
             <div className="flex gap-2 md:gap-3">
               {[
-                { Icon: Facebook, href: "#" },
+                { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61583802103561" },
                 { Icon: Twitter, href: "#" },
                 { Icon: Instagram, href: "#" },
                 { Icon: Linkedin, href: "#" },
@@ -116,7 +116,7 @@ const Footer = async () => {
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0" />
                 <a href="tel:17505816772" className="text-white/70 hover:text-primary font-medium transition-colors">
-                  17505816772
+                  +8615821730169
                 </a>
               </li>
               <li className="flex items-center gap-3">

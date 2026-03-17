@@ -4,9 +4,7 @@ import dbConnect from "@/lib/db";
 import Category from "@/models/Category";
 import SubCategory from "@/models/SubCategory";
 
-import { getLocale, getTranslations } from "next-intl/server"; 
-
-export const dynamic = "force-dynamic";
+import { getLocale, getTranslations } from "next-intl/server";
 
 async function getCategories(locale: string) {
   try {
@@ -69,6 +67,8 @@ export default async function Categories() {
                       fill
                       sizes="(max-width: 768px) 64px, 80px"
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      loading="lazy"
+                      quality={80}
                     />
                   </div>
                   <div>

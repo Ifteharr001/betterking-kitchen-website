@@ -118,7 +118,7 @@ For official tax invoice, please contact support.
           
           {/* Hero Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-100">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 mt-8 text-gray-100">
               {t("title1")} <span className="text-primary">{t("title2")}</span>
             </h1>
             <p className="text-lg text-gray-500 max-w-2xl mx-auto">

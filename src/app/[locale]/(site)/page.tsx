@@ -1,11 +1,15 @@
-import React from 'react';
-import Hero from './components/Hero';
-import Categories from './components/Categories';
-import TrustedBrands from './components/TrustedBrands';
-import FeaturedProducts from './components/FeaturedProducts';
-import ProductGrid from './components/ProductGrid';
-import WhyChooseUs from './components/WhyChooseUs';
-import Industries from './components/Industries';
+import React, { Suspense } from 'react';
+import dynamic from 'next/dynamic';
+
+const Hero = dynamic(() => import('./components/Hero'), { ssr: true });
+const Categories = dynamic(() => import('./components/Categories'), { ssr: true });
+const TrustedBrands = dynamic(() => import('./components/TrustedBrands'));
+const FeaturedProducts = dynamic(() => import('./components/FeaturedProducts'));
+const ProductGrid = dynamic(() => import('./components/ProductGrid'));
+const WhyChooseUs = dynamic(() => import('./components/WhyChooseUs'));
+const Industries = dynamic(() => import('./components/Industries'));
+
+export const revalidate = 3600;
 
 const homePage = () => {
     return (

@@ -90,6 +90,8 @@ const ProductGrid = async () => {
                     fill
                     className="object-contain p-4 group-hover:scale-110 transition-transform duration-500"
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    loading="lazy"
+                    quality={85}
                   />
                 </div>
 

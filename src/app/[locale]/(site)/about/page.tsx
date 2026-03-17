@@ -31,7 +31,7 @@ const AboutUs = () => {
   const stats = [
     { number: "1500+", label: t("stats.s1"), icon: Building2 },
     { number: "18+", label: t("stats.s2"), icon: Award },
-    { number: "50+", label: t("stats.s3"), icon: Globe },
+    { number: "75+", label: t("stats.s3"), icon: Globe },
     { number: "5000+", label: t("stats.s4"), icon: Users },
   ];
 

@@ -26,7 +26,7 @@ const Contact = () => {
   const [formData, setFormData] = useState({ fullName: "", email: "", phone: "", company: "", subject: "", message: "" });
 
   const contactCards = [
-    { icon: Phone, title: t("contactCards.c1Title"), value: "17505816772", sub: t("contactCards.c1Sub"), href: "tel:17505816772" },
+    { icon: Phone, title: t("contactCards.c1Title"), value: "+8615821730169", sub: t("contactCards.c1Sub"), href: "tel:+8615821730169" },
     { icon: Mail, title: t("contactCards.c2Title"), value: "liufenghua@betterkingkitchen.com", sub: t("contactCards.c2Sub"), href: "mailto:liufenghua@betterkingkitchen.com" },
     { icon: MapPin, title: t("contactCards.c3Title"), value: "6111, Zhongchun Road", sub: t("contactCards.c3Sub"), href: "#" },
     { icon: Clock, title: t("contactCards.c4Title"), value: "Mon – Fri: 9AM–6PM", sub: t("contactCards.c4Sub"), href: "#" },
@@ -42,8 +42,8 @@ const Contact = () => {
   ];
 
   const stats = [
-    { value: "15K+", label: t("stats.s1") },
-    { value: "50+", label: t("stats.s2") },
+    { value: "150K+", label: t("stats.s1") },
+    { value: "75+", label: t("stats.s2") },
     { value: "98%", label: t("stats.s3") },
     { value: "24/7", label: t("stats.s4") },
   ];
@@ -188,7 +188,7 @@ const Contact = () => {
                   <p className="text-sm text-gray-500 mb-4">
                     {t("helpDesc")}
                   </p>
-                  <a href="tel:17505816772" className="btn-gold text-sm w-full justify-center gap-2">
+                  <a href="tel:+8615821730169" className="btn-gold text-sm w-full justify-center gap-2">
                     <Phone className="w-4 h-4" /> {t("callNow")}
                   </a>
                 </div>
@@ -258,7 +258,7 @@ const Contact = () => {
                 <Link href={`/${locale}/products`} className="btn-gold gap-2">
                   {t("btnBrowse")} <ChevronRight className="w-4 h-4" />
                 </Link>
-                <a href="tel:17505816772" className="btn-outline gap-2">
+                <a href="tel:+8615821730169" className="btn-outline gap-2">
                   <Phone className="w-4 h-4" /> {t("btnCallUs")}
                 </a>
               </div>

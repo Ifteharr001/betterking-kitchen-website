@@ -164,7 +164,10 @@ export default function ProductsClient() {
                     src={product.image}
                     alt={getLocalizedText(product.name, locale)}
                     fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
                     className="object-contain p-2 sm:p-4 group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                    quality={85}
                   />
                   <div className="absolute bottom-4 right-4 gap-2 translate-y-10 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100 hidden sm:flex">
                     <span className="bg-white p-2 rounded-full shadow-md text-gray-600 hover:text-primary">

@@ -15,6 +15,10 @@ export const metadata: Metadata = {
   icons: {
     icon: "/white-logo.png", 
   },
+  other: {
+    'link-preload-white-logo': '/white-logo.png',
+    'link-preload-black-logo': '/black-logo.png',
+  },
 };
 
 export default async function RootLayout({

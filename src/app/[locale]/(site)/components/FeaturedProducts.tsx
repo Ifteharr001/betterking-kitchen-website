@@ -58,6 +58,8 @@ const FeaturedProducts = () => {
                 width={400}
                 height={400}
                 className="max-w-full max-h-[180px] md:max-h-[240px] object-contain group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+                quality={85}
               />
             </div>
             <div className="p-4 md:p-6 text-center">
@@ -82,6 +84,9 @@ const FeaturedProducts = () => {
               alt="Kitchen Accessories"
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-110"
+              loading="lazy"
+              quality={85}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-transparent" />
             <div className="relative z-10 p-5 md:p-6 text-white h-full flex flex-col justify-start">
@@ -106,6 +111,9 @@ const FeaturedProducts = () => {
               alt="Modern Kitchen"
               fill
               className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
+              loading="lazy"
+              quality={85}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
             <div className="relative z-10 p-5 md:p-8 text-white flex flex-col justify-center h-full items-start">

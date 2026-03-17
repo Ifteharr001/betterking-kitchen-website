@@ -110,8 +110,8 @@
     "browseAll": "Parcourir toute la collection",
     "box1Title": "Découvrez nos projets de cuisines commerciales haut de gamme",
     "box1Desc": "Voyez comment nous transformons les espaces culinaires avec des équipements de pointe et des designs innovants.",
-    "box2Title": "Profitez de réductions sensationnelles jusqu'à 50 % ce mois-ci seulement !",
-    "box2Desc": "Équipez votre cuisine avec les meilleurs outils disponibles.",
+    "box2Title": "Équipement de Cuisine Commerciale Haute Performance",
+    "box2Desc": "Découvrez notre gamme d'appareils de cuisine durables et de qualité professionnelle.",
     "box3Title": "Améliorez votre expérience culinaire",
     "box4Title": "Découvrez notre collection d'essentiels de cuisine",
     "viewMore": "VOIR PLUS"
@@ -550,6 +550,54 @@
     "toastSuccessDesc": "Votre ID de suivi : {id}. Enregistrez cet ID pour suivre l'état.",
     "toastFailedTitle": "Échec de la soumission",
     "toastFailedDesc": "Un problème est survenu. Veuillez réessayer."
+  },
+  "PrivacyPolicy": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour",
+    "section1Title": "1. Les informations que nous collectons",
+    "section1Content": "Nous collectons les informations que vous nous fournissez directement, par exemple lorsque vous demandez un devis, contactez le service client ou interagissez avec notre site Web. Cela peut inclure votre nom, votre adresse e-mail, votre numéro de téléphone et les détails de votre entreprise.",
+    "section2Title": "2. Comment nous utilisons vos informations",
+    "section2Content": "Nous utilisons les informations que nous collectons pour :",
+    "point1": "Fournir, entretenir et améliorer nos équipements et services de cuisine commerciale.",
+    "point2": "Traiter les transactions, envoyer des factures et gérer la logistique d'expédition.",
+    "point3": "Envoyer des avis techniques, des mises à jour, des alertes de sécurité et des messages d'assistance.",
+    "section3Title": "3. Cookies et suivi",
+    "section3Content": "Nous utilisons des cookies et des technologies de suivi similaires pour suivre l'activité sur notre site Web et conserver certaines informations afin d'améliorer votre expérience de navigation. Vous pouvez configurer votre navigateur pour refuser tous les cookies.",
+    "section4Title": "4. Nous contacter",
+    "section4Content": "Si vous avez des questions ou des préoccupations concernant cette politique de confidentialité, veuillez nous contacter à l'adresse suivante :"
+  },
+  "TermsOfService": {
+    "title": "Conditions d'Utilisation",
+    "lastUpdated": "Dernière mise à jour",
+    "section1Title": "1. Acceptation des Conditions",
+    "section1Content": "En accédant ou en utilisant le site Web et les services de BetterKing Kitchen, vous acceptez d'être lié par ces Conditions d'Utilisation. Si vous n'êtes pas d'accord avec une partie des conditions, vous ne pouvez pas accéder au service.",
+    "section2Title": "2. Produits et Services",
+    "section2Content": "Nous sommes spécialisés dans les équipements de cuisine commerciale. Toutes les descriptions de produits, spécifications et prix sont sujets à changement à tout moment sans préavis. Nous nous réservons le droit de modifier ou d'interrompre tout produit à tout moment.",
+    "section3Title": "3. Responsabilités de l'Utilisateur",
+    "section3Content": "Vous acceptez d'utiliser notre site Web et nos produits uniquement à des fins légales. Vous ne devez pas utiliser notre site d'une manière qui cause, ou pourrait causer, des dommages au site Web ou une altération de la disponibilité ou de l'accessibilité du site.",
+    "section4Title": "4. Limitation de Responsabilité",
+    "section4Content": "BetterKing Kitchen ne sera pas responsable des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs, y compris, sans limitation, la perte de profits, de données, d'utilisation, de clientèle ou d'autres pertes intangibles, résultant de votre accès ou de votre utilisation de nos services.",
+    "section5Title": "5. Coordonnées",
+    "section5Content": "Si vous avez des questions concernant ces Conditions, veuillez nous contacter à l'adresse suivante :"
+  },
+  "CookiePolicy": {
+    "title": "Política de Cookies",
+    "lastUpdated": "Última actualización",
+    "section1Title": "1. ¿Qué son las Cookies?",
+    "section1Content": "Las cookies son pequeños archivos de texto que se colocan en su computadora o dispositivo móvil cuando visita un sitio web. Se utilizan ampliamente para hacer que los sitios web funcionen de manera más eficiente y proporcionar información a los propietarios del sitio.",
+    "section2Title": "2. Cómo utilizamos las Cookies",
+    "section2Content": "BetterKing Kitchen utiliza cookies para comprender cómo interactúa con nuestro sitio web, recordar sus preferencias (como la selección de idioma) y mejorar su experiencia de navegación en general.",
+    "section3Title": "3. Tipos de Cookies que utilizamos",
+    "point1Title": "Cookies esenciales",
+    "point1Desc": "Estrictamente necesarias para que el sitio web funcione correctamente. No se pueden desactivar en nuestros sistemas.",
+    "point2Title": "Cookies analíticas/de rendimiento",
+    "point2Desc": "Nos permiten reconocer y contar el número de visitantes y ver cómo se mueven por nuestro sitio web.",
+    "point3Title": "Cookies de funcionalidad",
+    "point3Desc": "Se utilizan para reconocerlo cuando regresa a nuestro sitio web y recordar sus preferencias.",
+    "section4Title": "4. Gestión de Cookies",
+    "section4Content": "Puede indicar a su navegador que rechace todas las cookies o que le avise cuando se envía una cookie. Sin embargo, si no acepta las cookies, es posible que no pueda utilizar algunas partes de nuestro sitio web.",
+    "section5Title": "5. Contáctenos",
+    "section5Content": "Si tiene alguna pregunta sobre nuestra Política de Cookies, contáctenos en:"
   }
 
 }

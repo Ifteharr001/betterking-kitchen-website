@@ -65,7 +65,7 @@ const BeforeAfterSlider = ({ t }: { t: any }) => {
       {/* Before ) */}
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${sliderPosition}%` }}>
         <img
-          src="https://i.ibb.co.com/fzDbVw11/Gemini-Generated-Image-ejslpxejslpxejsl.png"
+          src="https://i.ibb.co.com/R4P48BVZ/Whats-App-Image-2026-03-12-at-8-16-10-AM.jpg"
           alt="Before - Old Kitchen"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ width: containerRef.current ? `${containerRef.current.offsetWidth}px` : '100vw', maxWidth: 'none' }}
@@ -80,7 +80,6 @@ const BeforeAfterSlider = ({ t }: { t: any }) => {
           </div>
         </div>
       </div>
-      {/* Labels */}
       <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full z-20">{t("before")}</div>
       <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs font-semibold px-3 py-1.5 rounded-full z-20">{t("after")}</div>
     </div>
@@ -230,7 +229,7 @@ useEffect(() => {
           <div className="relative max-w-5xl mx-auto">
             <div className="flex justify-center mb-8 md:mb-0">
               <div className="relative w-56 h-56 md:w-72 md:h-72 rounded-full overflow-hidden border-4 border-primary/30 shadow-2xl mx-auto md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-10">
-                <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=600&q=80" alt="Betterking Kitchen" className="w-full h-full object-cover" />
+                <img src="https://i.ibb.co.com/4RhTbppj/Whats-App-Image-2026-03-12-at-8-25-59-AM.jpg" alt="Betterking Kitchen" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
               <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full border border-dashed border-primary/20" />

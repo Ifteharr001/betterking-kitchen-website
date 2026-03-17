@@ -4,7 +4,7 @@ import FloatingContact from "./components/FloatingContact";
 import dbConnect from "@/lib/db";
 import Category from "@/models/Category";
 
-export const dynamic = "force-dynamic"; 
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function SiteLayout({
   children,

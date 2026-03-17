@@ -97,6 +97,8 @@ const Hero = () => {
             priority={index === 0} 
             className="object-cover"
             placeholder="blur"
+            quality={90}
+            sizes="100vw"
           />
           
           {slide.video && (
@@ -106,7 +108,7 @@ const Hero = () => {
               muted
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
               className="absolute inset-0 w-full h-full object-cover z-[1]"
               onLoadedData={(e) => {
                 (e.target as HTMLVideoElement).play();
