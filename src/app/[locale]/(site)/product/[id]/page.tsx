@@ -158,7 +158,7 @@ const ProductDetails = ({ params }: PageProps) => {
           </nav>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
-         
+          
             <div className="space-y-4">
             
               <div className="relative bg-gray-50 border border-gray-200 rounded-2xl p-8 aspect-square flex items-center justify-center">

@@ -19,8 +19,20 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    return NextResponse.json(order);
-  } catch (error) {
+    const response = {
+      orderId: order.orderId,
+      status: order.status,
+      createdAt: order.createdAt || order.date || new Date(),
+      productName: order.productName || "Product",
+      companyName: order.companyName,
+      mobile: order.mobile,
+      invoiceUrl: order.invoiceUrl,
+      amount: order.amount
+    };
+
+    return NextResponse.json(response);
+  } catch (error: any) {
+    console.error("Track order error:", error);
     return NextResponse.json({ error: "Failed to fetch order" }, { status: 500 });
   }
 }

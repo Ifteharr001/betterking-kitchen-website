@@ -16,8 +16,8 @@ import {
 
 const languages = [
   { code: "EN", value: "en", name: "English" },
-  { code: "BN", value: "bn", name: "বাংলা" },
   { code: "ZH", value: "zh", name: "中文" },
+  { code: "BN", value: "bn", name: "বাংলা" },
   { code: "ES", value: "es", name: "Español" },
   { code: "FR", value: "fr", name: "Français" },
   { code: "AR", value: "ar", name: "العربية" },
@@ -35,7 +35,7 @@ interface HeaderProps {
   categories?: any[]; 
 }
 
-const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }: HeaderProps) => {
+const Header = ({ lightBackground = false, hideTopBar = false, categories: initialCategories = [] }: HeaderProps) => {
   const t = useTranslations("Navigation"); 
   const currentLocale = useLocale();
 
@@ -52,6 +52,9 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   
   const [isMounted, setIsMounted] = useState(false);
+  const [categories, setCategories] = useState(initialCategories);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  
   const pathname = usePathname();
   const router = useRouter(); 
 
@@ -84,13 +87,53 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
   };
 
   useEffect(() => {
-    setIsMounted(true); 
+    setIsMounted(true);
     
+    if (categories.length === 0 && !categoriesLoading) {
+      setCategoriesLoading(true);
+      
+      fetch(`/api/categories`, {
+        method: 'GET',
+        cache: 'force-cache',
+        priority: 'high'
+      })
+        .then(res => {
+          return res.json();
+        })
+        .then(data => {
+          if (data && data.length > 0) {
+            setCategories(data);
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('categories', JSON.stringify(data));
+            }
+          }
+        })
+        .catch(err => {
+          console.error("Failed to fetch categories:", err);
+          if (typeof window !== 'undefined') {
+            const cached = sessionStorage.getItem('categories');
+            if (cached) {
+              try {
+                setCategories(JSON.parse(cached));
+              } catch (e) {
+                console.error("Failed to parse cached categories:", e);
+              }
+            }
+          }
+        })
+        .finally(() => setCategoriesLoading(false));
+    }
+  }, []); 
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -154,7 +197,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
       {!shouldHideTopBar && (
         <div 
           className={`transition-all duration-300 overflow-hidden hidden md:block ${
-            isScrolled ? 'max-h-0 opacity-0' : 'max-h-12 opacity-100'
+            isScrolled ? 'max-h-0 opacity-0 pointer-events-none' : 'max-h-12 opacity-100 pointer-events-auto'
           }`}
         >
           <div className="bg-transparent">
@@ -162,21 +205,21 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
               <div className="flex items-center justify-between h-10 text-sm">
                 <div className="flex items-center gap-6">
                 
-                  <a href="tel:17505816772" className="flex items-center gap-2 text-white hover:text-primary transition-colors">
+                  <a href="tel:17505816772" aria-label="Call Us" className="flex items-center gap-2 text-white hover:text-primary transition-colors">
                     <Phone className="w-3.5 h-3.5" />
                     <span>+8615821730169</span>
                   </a>
-                  <a href="mailto:liufenghua@betterkingkitchen.com" className="flex items-center gap-2 text-white hover:text-primary transition-colors">
+                  <a href="mailto:liufenghua@betterkingkitchen.com" aria-label="Contact mail" className="flex items-center gap-2 text-white hover:text-primary transition-colors">
                     <Mail className="w-3.5 h-3.5" />
                     <span>liufenghua@betterkingkitchen.com</span>
                   </a>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-3">
-                    <a href="https://www.facebook.com/profile.php?id=61583802103561" className="text-white hover:text-primary transition-colors"><Facebook className="w-4 h-4" /></a>
-                    <a href="#" className="text-white hover:text-primary transition-colors"><Twitter className="w-4 h-4" /></a>
-                    <a href="#" className="text-white hover:text-primary transition-colors"><Instagram className="w-4 h-4" /></a>
-                    <a href="#" className="text-white hover:text-primary transition-colors"><Linkedin className="w-4 h-4" /></a>
+                    <a  href="https://www.facebook.com/profile.php?id=61583802103561" aria-label="Visit our Facebook page" className="text-white hover:text-primary transition-colors"><Facebook className="w-4 h-4" /></a>
+                    <a href="#" aria-label="Visit our x" className="text-white hover:text-primary transition-colors"><Twitter className="w-4 h-4" /></a>
+                    <a href="#" aria-label="Visit our Instagram" className="text-white hover:text-primary transition-colors"><Instagram className="w-4 h-4" /></a>
+                    <a href="#" aria-label="Visit our Linkedin" className="text-white hover:text-primary transition-colors"><Linkedin className="w-4 h-4" /></a>
                   </div>
 
                   {isMounted && (
@@ -216,13 +259,22 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center justify-between h-20"> 
             
-            <Link href={getLocalizedLink("/")} prefetch={true} className={`flex items-center ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
+            <Link href={getLocalizedLink("/")} prefetch={false} className={`flex items-center ${isSearchOpen ? 'hidden md:flex' : 'flex'}`}>
               <div className="relative h-12 w-40">
                 <Image 
-                  src={showDarkMode ? "/black-logo.png" : "/white-logo.png"}
+                  src="/white-logo.webp"
                   alt="BetterKing Logo"
                   fill
-                  className="object-contain object-left"
+                  sizes="(max-width: 768px) 150px, 272px"
+                  className={`object-contain object-left transition-opacity duration-300 ${showDarkMode ? 'opacity-0' : 'opacity-100'}`}
+                  priority
+                />
+                <Image 
+                  src="/black-logo.webp"
+                  alt="BetterKing Logo"
+                  fill
+                  sizes="(max-width: 768px) 150px, 272px"
+                  className={`object-contain object-left transition-opacity duration-300 ${showDarkMode ? 'opacity-100' : 'opacity-0'}`}
                   priority
                 />
               </div>
@@ -230,12 +282,12 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
 
             <div className={`hidden lg:flex items-center gap-8 ${isSearchOpen ? 'opacity-0 pointer-events-none w-0' : 'opacity-100 w-auto'} transition-all duration-300`}>
               
-              <Link href={getLocalizedLink("/")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/")}`}>
+              <Link href={getLocalizedLink("/")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/")}`}>
                 {t("home")}
               </Link>
               
               <div className="relative group py-4">
-                <Link href={getLocalizedLink("/products")} prefetch={true} className={`flex items-center gap-1 text-sm font-bold transition-colors uppercase ${getLinkClass("/products")}`}>
+                <Link href={getLocalizedLink("/products")} prefetch={false} className={`flex items-center gap-1 text-sm font-bold transition-colors uppercase ${getLinkClass("/products")}`}>
                   {t("products")}
                   <ChevronDown className="w-3.5 h-3.5" />
                 </Link>
@@ -251,9 +303,9 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                         >
                           {chunk.map((cat: any) => (
                             <Link 
-                              prefetch={true} 
                               key={cat._id} 
                               href={getLocalizedLink(`/categories/${cat.slug}`)} 
+                              prefetch={false}
                               className="block px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-primary hover:bg-primary/5 transition-colors"
                             >
                               {getLocalizedText(cat.name, currentLocale)}
@@ -262,32 +314,34 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                         </div>
                       ))
                     ) : (
-                      <div className="w-64 px-5 py-3 text-sm text-gray-500">No categories found</div>
+                      <div className="w-64 px-5 py-3 text-sm text-gray-500">
+                        {categoriesLoading ? "Loading categories..." : "No categories found"}
+                      </div>
                     )}
 
                   </div>
                 </div>
               </div>
 
-              <Link href={getLocalizedLink("/solutions")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/solutions")}`}>
+              <Link href={getLocalizedLink("/solutions")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/solutions")}`}>
                 {t("solutions")}
               </Link>
-              <Link href={getLocalizedLink("/industries")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/industries")}`}>
+              <Link href={getLocalizedLink("/industries")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/industries")}`}>
                 {t("industries")}
               </Link>
-              <Link href={getLocalizedLink("/projects")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/projects")}`}>
+              <Link href={getLocalizedLink("/projects")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/projects")}`}>
                 {t("projects")}
               </Link>
-              <Link href={getLocalizedLink("/news")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/news")}`}>
+              <Link href={getLocalizedLink("/news")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/news")}`}>
                 {t("news")}
               </Link>
-              <Link href={getLocalizedLink("/track-order")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/track-order")}`}>
+              <Link href={getLocalizedLink("/track-order")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/track-order")}`}>
                 {t("trackOrder")}
               </Link>
-              <Link href={getLocalizedLink("/about")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/about")}`}>
+              <Link href={getLocalizedLink("/about")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/about")}`}>
                 {t("about")}
               </Link>
-              <Link href={getLocalizedLink("/contact")} prefetch={true} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/contact")}`}>
+              <Link href={getLocalizedLink("/contact")} prefetch={false} className={`text-sm font-bold transition-colors uppercase ${getLinkClass("/contact")}`}>
                 {t("contact")}
               </Link>
             </div>
@@ -308,6 +362,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                     />
                     <button 
                       type="button"
+                      aria-label="Close Mobile Menu"
                       onClick={() => setIsSearchOpen(false)}
                       className="text-gray-500 hover:text-red-500 transition-colors p-1"
                     >
@@ -317,6 +372,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                 ) : (
                   <button 
                     onClick={() => setIsSearchOpen(true)}
+                    aria-label="Open Search"
                     className={`p-1 transition-colors ${
                       showDarkMode ? 'text-gray-600 hover:text-gray-900' : 'text-white hover:text-primary'
                     }`}
@@ -327,6 +383,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
               </div>
 
               <button 
+              aria-label="GetQuote Button"
                 onClick={() => window.dispatchEvent(new Event("openContactModal"))} 
                 className={`btn-gold hidden sm:inline-flex ${isSearchOpen ? 'hidden md:inline-flex' : ''}`}
               >
@@ -337,6 +394,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                 className={`lg:hidden p-2 transition-colors ${
                   showDarkMode ? 'text-gray-900' : 'text-white'
                 }`}
+                aria-label="Toggle Mobile Menu"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -356,6 +414,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
+                      aria-label="Language Toggle"
                       onClick={() => handleLanguageChange(lang.value, lang.code)}
                       className={`px-3 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
                         selectedLang === lang.code 
@@ -369,14 +428,15 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                 </div>
               </div>
 
-              <Link href={getLocalizedLink("/")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/")} uppercase`}>{t("home")}</Link>
+              <Link href={getLocalizedLink("/")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/")} uppercase`}>{t("home")}</Link>
               
               <div className="border-b border-gray-50 pb-1 mb-1">
                 <div className="flex items-center justify-between pr-2">
-                  <Link href={getLocalizedLink("/products")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`flex-1 uppercase ${getMobileLinkClass("/products")}`}>
+                  <Link href={getLocalizedLink("/products")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`flex-1 uppercase ${getMobileLinkClass("/products")}`}>
                     {t("products")}
                   </Link>
                   <button 
+                  aria-label="Mobile Product Open"
                     onClick={() => setMobileProductsOpen(!mobileProductsOpen)} 
                     className="p-2 text-gray-500 hover:text-primary bg-gray-50 rounded-lg ml-2"
                   >
@@ -389,8 +449,8 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                     {categories.map((cat) => (
                       <Link 
                         key={cat._id} 
-                        prefetch={true}
                         href={getLocalizedLink(`/categories/${cat.slug}`)} 
+                        prefetch={false}
                         className="block py-2 px-4 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
                         onClick={() => setMobileMenuOpen(false)}
                       >
@@ -401,16 +461,17 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
                 )}
               </div>
 
-              <Link href={getLocalizedLink("/solutions")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/solutions")} uppercase`}>{t("solutions")}</Link>
-              <Link href={getLocalizedLink("/industries")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/industries")} uppercase`}>{t("industries")}</Link>
-              <Link href={getLocalizedLink("/projects")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/projects")} uppercase`}>{t("projects")}</Link>
-              <Link href={getLocalizedLink("/news")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/news")} uppercase`}>{t("news")}</Link>
-              <Link href={getLocalizedLink("/track-order")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/track-order")} uppercase`}>{t("trackOrder")}</Link>
-              <Link href={getLocalizedLink("/about")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/about")} uppercase`}>{t("about")}</Link>
-              <Link href={getLocalizedLink("/contact")} prefetch={true} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/contact")} uppercase`}>{t("contact")}</Link>
+              <Link href={getLocalizedLink("/solutions")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/solutions")} uppercase`}>{t("solutions")}</Link>
+              <Link href={getLocalizedLink("/industries")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/industries")} uppercase`}>{t("industries")}</Link>
+              <Link href={getLocalizedLink("/projects")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/projects")} uppercase`}>{t("projects")}</Link>
+              <Link href={getLocalizedLink("/news")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/news")} uppercase`}>{t("news")}</Link>
+              <Link href={getLocalizedLink("/track-order")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/track-order")} uppercase`}>{t("trackOrder")}</Link>
+              <Link href={getLocalizedLink("/about")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/about")} uppercase`}>{t("about")}</Link>
+              <Link href={getLocalizedLink("/contact")} prefetch={false} onClick={() => setMobileMenuOpen(false)} className={`${getMobileLinkClass("/contact")} uppercase`}>{t("contact")}</Link>
               
               <div className="pt-3 px-4">
                 <button 
+                aria-label="Open Contact Model"
                   onClick={() => {
                     setMobileMenuOpen(false);
                     window.dispatchEvent(new Event("openContactModal"));
@@ -422,11 +483,11 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories = [] }
               </div>
               
               <div className="pt-3 px-4 space-y-2 border-t border-gray-100 mt-3 pb-4">
-                <a href="tel:17505816772" className="flex items-center gap-2 text-sm text-gray-600">
+                <a href="tel:17505816772" aria-label="contact number" className="flex items-center gap-2 text-sm text-gray-600">
                   <Phone className="w-4 h-4 text-primary" />
                   +8615821730169
                 </a>
-                <a href="mailto:liufenghua@betterkingkitchen.com" className="flex items-center gap-2 text-sm text-gray-600">
+                <a href="mailto:liufenghua@betterkingkitchen.com" aria-label="contact mail" className="flex items-center gap-2 text-sm text-gray-600">
                   <Mail className="w-4 h-4 text-primary" />
                   liufenghua@betterkingkitchen.com
                 </a>

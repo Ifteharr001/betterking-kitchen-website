@@ -9,8 +9,8 @@ import {
   Quote, Play, Star, Target, Heart, Zap 
 } from "lucide-react";
 
-import aboutHero from "@/assets/about-hero.jpg";
-import bossPhoto from "@/assets/boss-photo.jpg";
+import aboutHero from "@/assets/about-hero.webp";
+import bossPhoto from "@/assets/boss-photo.webp";
 import TrustedBrands from "../components/TrustedBrands"
 
 
@@ -80,14 +80,14 @@ const AboutUs = () => {
           <div className="max-w-5xl mx-auto">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
               <video
-                ref={videoRef}
-                className="w-full aspect-video object-cover"
-                controls={videoPlaying}
-                poster={aboutHero.src}
-                playsInline
-              >
-                <source src="/videos/about-video.mp4" type="video/mp4" />
-              </video>
+          ref={videoRef}
+          className="w-full aspect-video object-cover"
+          controls={videoPlaying}
+          poster={aboutHero.src}
+          playsInline
+        >
+          <source src="https://res.cloudinary.com/dnrpstwps/video/upload/q_auto:best,f_webm/v1774561173/about-video_y7tb0b.mp4" type="video/mp4" />
+        </video>
               {!videoPlaying && (
                 <div 
                   className="absolute inset-0 bg-black/40 flex items-center justify-center cursor-pointer group-hover:bg-black/30 transition-all" 

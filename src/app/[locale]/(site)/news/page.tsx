@@ -5,7 +5,8 @@ import connectDB from "@/lib/db";
 import Blog from "@/models/Blog";
 import { getTranslations } from "next-intl/server";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 120; 
+export const dynamic = 'auto'; 
 
 async function getBlogs(locale: string) {
   try {

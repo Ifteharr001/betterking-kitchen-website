@@ -2,6 +2,9 @@ import Categories from "../components/Categories";
 import ProductsClient from "./ProductsClient";
 import { Suspense } from "react";
 
+export const revalidate = 60; // Revalidate every 60 seconds for fresh data
+export const dynamic = 'auto'; // Allow static generation
+
 export default async function ProductsPage({
   searchParams,
 }: {

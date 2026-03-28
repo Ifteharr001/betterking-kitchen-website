@@ -7,7 +7,8 @@ import Category from "@/models/Category";
 import SubCategory from "@/models/SubCategory";
 import { getLocale, getTranslations } from "next-intl/server";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'auto'; // Allow ISR
 
 type SubCategoryType = {
   _id: string;

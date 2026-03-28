@@ -5,10 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl"; 
 
-import productOven from "@/assets/product-oven.png";
-import productMixer from "@/assets/product-mixer.png";
-import productFridge from "@/assets/product-fridge.png";
-import heroKitchen from "@/assets/hero-kitchen.png"; 
+import productOven from "@/assets/product-oven.webp";
+import productMixer from "@/assets/product-mixer.webp";
+import productFridge from "@/assets/product-fridge.webp";
+import heroKitchen from "@/assets/hero-kitchen.webp"; 
 
 const FeaturedProducts = () => {
   const t = useTranslations("FeaturedProducts"); 
@@ -59,6 +59,7 @@ const FeaturedProducts = () => {
                 height={400}
                 className="max-w-full max-h-[180px] md:max-h-[240px] object-contain group-hover:scale-105 transition-transform duration-500"
                 loading="lazy"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 quality={85}
               />
             </div>
@@ -134,6 +135,7 @@ const FeaturedProducts = () => {
               src={productMixer} 
               alt="Kitchen Essentials"
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />

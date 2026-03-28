@@ -5,7 +5,10 @@ import Link from "next/link";
 import connectDB from "@/lib/db";
 import Industry from "@/models/Industry";
 import Blog from "@/models/Blog"; 
-import { getLocale, getTranslations } from "next-intl/server"; 
+import { getLocale, getTranslations } from "next-intl/server";
+
+export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'auto';
 
 // 💡 ম্যাজিক ফাংশন: অবজেক্ট থেকে টেক্সট বের করার জন্য (যাতে ক্র্যাশ না করে)
 const getLocalizedText = (val: any, locale: string) => {

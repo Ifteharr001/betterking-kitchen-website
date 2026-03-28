@@ -6,6 +6,8 @@ import ProductModel from "@/models/Product";
 import CategoryModel from "@/models/Category";
 
 import { getLocale, getTranslations } from "next-intl/server";
+ 
+export const revalidate = 86400; 
 
 interface Product {
   id: string;
@@ -82,11 +84,12 @@ const ProductGrid = async () => {
                 key={product.id}
                 href={`/${locale}/product/${product.id}`} 
                 className="product-card group flex flex-col bg-white border border-gray-800 rounded-xl overflow-hidden hover:border-[#D4AF37]/50 transition-colors"
+                aria-label={`View details for ${getLocalizedText(product.name, 'en')}`}
               >
                 <div className="bg-gray-100 flex items-center justify-center p-4 aspect-square overflow-hidden relative">
                   <Image
                     src={product.image}
-                    alt={getLocalizedText(product.name, locale)}
+                    alt={getLocalizedText(product.name, locale) || "Product Image"}
                     fill
                     className="object-contain p-4 group-hover:scale-110 transition-transform duration-500"
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -102,7 +105,6 @@ const ProductGrid = async () => {
                   <h3 className="font-semibold text-gray-900 text-xs md:text-sm leading-snug group-hover:text-[#D4AF37] transition-colors line-clamp-2">
                     {getLocalizedText(product.name, locale)}
                   </h3>
-                  
                 </div>
 
                 <div className="px-3 md:px-4 pb-3 md:pb-4 mt-auto bg-white">
@@ -112,17 +114,21 @@ const ProductGrid = async () => {
                       <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                     
-                    <button 
+                   
+                    <div 
+                      aria-label="Quick View"
                       className="w-7 h-7 md:w-8 md:h-8 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-all duration-200 bg-white"
                     >
                       <Eye className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                    </button>
+                    </div>
                     
-                    <button
+                  
+                    <div
+                      aria-label="Open in new tab"
                       className="w-7 h-7 md:w-8 md:h-8 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-all duration-200 hidden sm:flex bg-white"
                     >
                       <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                    </button>
+                    </div>
                   </div>
                 </div>
               </Link>

@@ -1,36 +1,40 @@
 import Footer from "./components/Footer"; 
 import Header from "./components/Header"; 
 import FloatingContact from "./components/FloatingContact";
-import dbConnect from "@/lib/db";
-import Category from "@/models/Category";
+import { Suspense } from "react";
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 60; // Aggressively revalidate every 60 seconds for faster updates
+export const dynamic = 'auto'; // Allow static generation with dynamic content
 
-export default async function SiteLayout({
+// Loading placeholder for Header
+function HeaderSkeleton() {
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+      <nav className="container mx-auto px-4 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          <div className="h-12 w-40 bg-gray-200 rounded animate-pulse" />
+          <div className="hidden lg:flex gap-8">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+export default function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  
-  let categories: { _id: string; name: any; slug: string }[] = [];
-  
-  try {
-    await dbConnect();
-    const rawCategories = await Category.find({}).lean();
-    
-    categories = rawCategories.map((cat: any) => ({
-      _id: cat._id.toString(),
-      name: cat.name, 
-      slug: cat.slug
-    }));
-  } catch (error) {
-    console.error("Failed to fetch categories in layout:", error);
-  }
-
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative">
       
-      <Header categories={categories} />
+      <Suspense fallback={<HeaderSkeleton />}>
+        <Header categories={[]} />
+      </Suspense>
       
       <main className="flex-1">
         {children}

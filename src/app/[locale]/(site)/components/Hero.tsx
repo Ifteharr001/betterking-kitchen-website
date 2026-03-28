@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import heroImage from "@/assets/hero-kitchen.png"; 
+import heroImage from "@/assets/hero-kitchen.webp"; 
 
 const Hero = () => {
   const t = useTranslations("Hero");
@@ -31,7 +31,7 @@ const Hero = () => {
       title: t("slides.1.title"),
       highlight: t("slides.1.highlight"),
       description: t("slides.1.description"),
-      video: "/videos/hero-video-2.mp4",
+      video: "https://res.cloudinary.com/dnrpstwps/video/upload/q_auto:best,f_webm/v1774552363/hero-video-2_njpb03.mp4",
       image: heroImage,
       overlay: "bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/70 to-[#0a1628]/30",
       cta: { 
@@ -45,7 +45,7 @@ const Hero = () => {
       title: t("slides.2.title"),
       highlight: t("slides.2.highlight"),
       description: t("slides.2.description"),
-      video: "/videos/hero-video-3.mp4",
+      video: "https://res.cloudinary.com/dnrpstwps/video/upload/q_auto:best,f_webm/v1774552655/hero-video-3_wxjrsu.mp4",
       image: heroImage,
       overlay: "bg-gradient-to-r from-[#1a3a5c]/90 via-[#1a3a5c]/60 to-[#1a3a5c]/20",
       cta: { 
@@ -57,6 +57,14 @@ const Hero = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [loadVideos, setLoadVideos] = useState(false); 
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadVideos(true);
+    }, 1500); 
+    return () => clearTimeout(timer);
+  }, []);
 
   const goToSlide = useCallback((index: number) => {
     if (isTransitioning) return;
@@ -101,7 +109,7 @@ const Hero = () => {
             sizes="100vw"
           />
           
-          {slide.video && (
+          {slide.video && loadVideos && (
             <video
               key={slide.video}
               autoPlay
@@ -152,6 +160,7 @@ const Hero = () => {
                 
                 {slide.cta.secondary.isModal ? (
                   <button 
+                  aria-label="Slide Category"
                     onClick={() => window.dispatchEvent(new Event("openContactModal"))}
                     className="inline-flex items-center justify-center gap-2 px-5 md:px-6 py-3 text-sm font-semibold rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-300"
                   >
@@ -175,12 +184,14 @@ const Hero = () => {
       </div>
 
       <button 
+      aria-label="Previouse Slider btn"
         onClick={prevSlide}
         className="absolute left-2 sm:left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
       >
         <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
       </button>
       <button 
+      aria-label="Next Slider btn"
         onClick={nextSlide}
         className="absolute right-2 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-all duration-300"
       >
@@ -190,6 +201,7 @@ const Hero = () => {
       <div className="absolute right-4 sm:right-8 lg:right-12 bottom-8 sm:bottom-10 z-20 flex items-center gap-3">
         {slides.map((_, index) => (
           <button
+          aria-label="slide"
             key={index}
             onClick={() => goToSlide(index)}
             className={`transition-all duration-300 ${

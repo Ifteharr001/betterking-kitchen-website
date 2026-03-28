@@ -1,5 +1,8 @@
 import { useTranslations } from "next-intl";
 
+export const revalidate = 86400; // Revalidate every day
+export const dynamic = 'auto';
+
 export default function CookiePolicyPage() {
   const t = useTranslations("CookiePolicy");
 

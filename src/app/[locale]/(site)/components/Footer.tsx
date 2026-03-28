@@ -39,7 +39,7 @@ const Footer = async () => {
             <Link href={`/${locale}`} className="flex items-center gap-2 mb-4 md:mb-6 w-fit">
               <div className="relative h-12 w-40"> 
                 <Image 
-                   src="/white-logo.png" 
+                   src="/white-logo.webp" 
                    alt="BetterKing Logo" 
                    fill
                    className="object-contain object-left"
@@ -115,13 +115,13 @@ const Footer = async () => {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0" />
-                <a href="tel:17505816772" className="text-white/70 hover:text-primary font-medium transition-colors">
+                <a href="tel:17505816772" aria-label="contact number" className="text-white/70 hover:text-primary font-medium transition-colors">
                   +8615821730169
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 md:w-5 md:h-5 text-primary shrink-0" />
-                <a href="mailto:liufenghua@betterkingkitchen.com" className="text-white/70 hover:text-primary font-medium transition-colors break-all">
+                <a href="mailto:liufenghua@betterkingkitchen.com" aria-label="contact mail" className="text-white/70 hover:text-primary font-medium transition-colors break-all">
                   liufenghua@betterkingkitchen.com
                 </a>
               </li>

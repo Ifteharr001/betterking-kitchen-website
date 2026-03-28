@@ -35,6 +35,12 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  compress: true,
+  productionBrowserSourceMaps: false,
+  onDemandEntries: {
+    maxInactiveAge: 60 * 60 * 1000, 
+    pagesBufferLength: 10,
+  },
 };
 
 export default withNextIntl(nextConfig);

@@ -4,6 +4,9 @@ import connectDB from "@/lib/db";
 import IndustryModel from "@/models/Industry";
 import { getLocale, getTranslations } from "next-intl/server"; 
 
+ 
+export const revalidate = 86400;
+
 const getLocalizedText = (val: any, locale: string) => {
   if (!val) return "";
   if (typeof val === 'string') return val;
@@ -72,14 +75,17 @@ const Industries = async () => {
                     href={`/${locale}/industries/${industry._id}`} 
                     key={industry._id}
                     className="block"
+                    aria-label={`Learn more about our ${getLocalizedText(industry.name, 'en')} industry solutions`}
                   >
                     <div className="relative h-60 sm:h-80 rounded-xl overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300">
                       <Image 
                         src={industry.image} 
-                        alt={getLocalizedText(industry.name, locale)} 
+                        alt={getLocalizedText(industry.name, locale) || "Industry Image"} 
                         fill 
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        loading="lazy"   
+                        quality={85}     
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
