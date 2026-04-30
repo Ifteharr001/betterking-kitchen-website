@@ -67,7 +67,7 @@ const AdminSidebar = ({ collapsed, setCollapsed }: AdminSidebarProps) => {
         <div className={cn("border-b border-border flex items-center transition-all duration-300 h-[70px]", collapsed ? "justify-center" : "px-6")}>
           <div className={cn("relative transition-all duration-300", collapsed ? "w-10 h-8" : "w-32 h-10")}>
             <Image 
-              src="/white-logo.png" 
+              src="/white-logo.webp" 
               alt="BetterKing Admin" 
               fill
               className={cn("object-contain", collapsed ? "object-center" : "object-left")}

@@ -5,12 +5,20 @@ import Link from "next/link";
 import connectDB from "@/lib/db";
 import Industry from "@/models/Industry";
 import Blog from "@/models/Blog"; 
-import { getLocale, getTranslations } from "next-intl/server";
+import CloudinaryImage from "../components/CloudinaryImage";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 
-export const revalidate = 3600; // Revalidate every hour
-export const dynamic = 'auto';
+export const revalidate = 86400; 
 
-// 💡 ম্যাজিক ফাংশন: অবজেক্ট থেকে টেক্সট বের করার জন্য (যাতে ক্র্যাশ না করে)
+export function generateStaticParams() {
+  return [
+    { locale: 'en' }, { locale: 'bn' }, { locale: 'fr' }, 
+    { locale: 'es' }, { locale: 'ar' }, { locale: 'zh' }
+  ]; 
+}
+
+
+
 const getLocalizedText = (val: any, locale: string) => {
   if (!val) return "";
   if (typeof val === 'string') return val;
@@ -51,7 +59,7 @@ async function getFeaturedBlogs() {
     const blogs = await Blog.find({}).sort({ createdAt: -1 }).limit(3).lean();
     return blogs.map((blog: any) => ({
       ...blog,
-      _id: blog._id.toString(),
+      _id: (blog._id as any).toString(),
       year: blog.createdAt ? new Date(blog.createdAt).getFullYear().toString() : "2024",
     }));
   } catch (error) {
@@ -66,7 +74,7 @@ async function getMoreProjects() {
     const industries = await Industry.find({}).lean();
     return industries.map((ind: any) => ({
       ...ind,
-      _id: ind._id.toString(),
+      _id: (ind._id as any).toString(),
     }));
   } catch (error) {
     console.error("Error fetching projects:", error);
@@ -74,11 +82,14 @@ async function getMoreProjects() {
   }
 }
 
-const Projects = async () => {
+const Projects = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  
+  setRequestLocale(locale);
+
   const featuredBlogs = await getFeaturedBlogs();
   const moreProjects = await getMoreProjects();
-  const locale = await getLocale(); 
-  const t = await getTranslations("ProjectsPage"); 
+  const t = await getTranslations("ProjectsPage");
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -107,22 +118,24 @@ const Projects = async () => {
               <p className="text-gray-500 text-sm md:text-base max-w-xl mx-auto">{t("spotlightDesc")}</p>
             </div>
 
-            <div className="space-y-8 md:space-y-12">
+           <div className="space-y-8 md:space-y-12">
               {featuredBlogs.length > 0 ? (
                 featuredBlogs.map((blog: any, i: number) => (
                   <div key={blog._id} className={`grid md:grid-cols-2 gap-6 md:gap-10 items-center ${i % 2 === 1 ? "md:flex-row-reverse" : ""}`}>
                     
                     <div className={`rounded-2xl overflow-hidden border border-gray-100 shadow-sm ${i % 2 === 1 ? "md:order-2" : ""}`}>
                       <div className="relative w-full h-64 md:h-80">
-                        <Image 
+                        <CloudinaryImage
                           src={blog.image} 
                           alt={getLocalizedText(blog.title, locale)} 
                           fill
                           className="object-cover hover:scale-105 transition-transform duration-700" 
+                         
+                          priority={i < 2} 
+                          sizes="(max-width: 768px) 100vw, 50vw"
                         />
                       </div>
                     </div>
-                    
                     {/* Content Side */}
                     <div className={i % 2 === 1 ? "md:order-1" : ""}>
                       <div className="flex items-center gap-3 mb-3">
@@ -192,7 +205,7 @@ const Projects = async () => {
                 moreProjects.map((p: any) => (
                   <Link href={`/${locale}/industries/${p._id}`} key={p._id} className="block">
                     <div className="group rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer relative h-48 md:h-56 w-full">
-                      <Image 
+                      <CloudinaryImage
                         src={p.image} 
                         alt={getLocalizedText(p.name, locale)} 
                         fill

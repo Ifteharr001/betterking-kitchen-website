@@ -70,7 +70,8 @@ const Industries = async () => {
           <div className="lg:col-span-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {industries.length > 0 ? (
-                industries.map((industry: any) => (
+                // ফিক্স: ম্যাপ ফাংশনে index রিসিভ করছি
+                industries.map((industry: any, index: number) => (
                   <Link 
                     href={`/${locale}/industries/${industry._id}`} 
                     key={industry._id}
@@ -84,7 +85,8 @@ const Industries = async () => {
                         fill 
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        loading="lazy"   
+                        
+                        priority={index < 3} 
                         quality={85}     
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />

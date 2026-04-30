@@ -77,7 +77,7 @@ const AdminLogin = () => {
         <div className="relative z-10 text-center px-12">
           <div className="relative w-64 h-24 mx-auto mb-6">
             <Image 
-              src="/white-logo.png" 
+              src="/white-logo.webp" 
               alt="BetterKing Admin Logo"
               fill
               className="object-contain"
@@ -113,7 +113,7 @@ const AdminLogin = () => {
           <div className="lg:hidden text-center mb-8">
             <div className="relative w-48 h-16 mx-auto mb-4">
               <Image 
-                src="/black-logo.png" 
+                src="/black-logo.webp" 
                 alt="BetterKing Logo"
                 fill
                 className="object-contain"

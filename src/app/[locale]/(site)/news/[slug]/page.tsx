@@ -4,8 +4,29 @@ import { notFound } from "next/navigation";
 import { Calendar, MapPin, Tag, ArrowLeft } from "lucide-react";
 import connectDB from "@/lib/db";
 import Blog from "@/models/Blog";
+import { setRequestLocale } from "next-intl/server";
+import CloudinaryImage from "../../components/CloudinaryImage";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  const locales = ['en', 'bn', 'fr', 'es', 'ar', 'zh'];
+  
+  await connectDB();
+  const blogs = await Blog.find({}).select('slug').lean();
+
+  const params = [];
+
+  for (const locale of locales) {
+    for (const blog of blogs) {
+      if (blog.slug) {
+        params.push({ locale, slug: blog.slug });
+      }
+    }
+  }
+
+  return params;
+}
 
 async function getBlog(slug: string, locale: string) {
   try {
@@ -18,7 +39,7 @@ async function getBlog(slug: string, locale: string) {
       ...blog,
       _id: (blog._id as any).toString(),
       createdAt: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : "N/A",
-     
+      
       title: blog.title?.[locale] || blog.title?.en || "",
       category: blog.category?.[locale] || blog.category?.en || "",
       location: blog.location?.[locale] || blog.location?.en || "",
@@ -35,6 +56,8 @@ export default async function BlogDetailsPage({ params }: { params: Promise<{ sl
   
   const { slug, locale } = await params;
   
+  setRequestLocale(locale);
+  
   const blog = await getBlog(slug, locale);
 
   if (!blog) {
@@ -45,12 +68,13 @@ export default async function BlogDetailsPage({ params }: { params: Promise<{ sl
     <div className="min-h-screen bg-white py-12 md:py-20 mt-16">
    
       <div className="w-full h-[300px] md:h-[500px] relative">
-        <Image
+        <CloudinaryImage
           src={blog.image || "/placeholder.jpg"}
           alt={blog.title}
           fill
           className="object-cover"
           priority
+          sizes="100vw" 
         />
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 flex items-center justify-center">

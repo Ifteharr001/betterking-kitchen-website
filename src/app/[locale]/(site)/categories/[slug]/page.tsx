@@ -5,10 +5,30 @@ import { Button } from "@/components/ui/button";
 import dbConnect from "@/lib/db";
 import Category from "@/models/Category";
 import SubCategory from "@/models/SubCategory";
-import { getLocale, getTranslations } from "next-intl/server";
 
-export const revalidate = 3600; // Revalidate every hour
-export const dynamic = 'auto'; // Allow ISR
+import { getTranslations, setRequestLocale } from "next-intl/server";
+
+export const revalidate = 86400; 
+
+export async function generateStaticParams() {
+  const locales = ['en', 'bn', 'fr', 'es', 'ar', 'zh'];
+  await dbConnect();
+  
+  const categories = await Category.find({}).select('slug').lean();
+
+  const params = [];
+  for (const locale of locales) {
+    for (const cat of categories) {
+      if (cat.slug) {
+        params.push({ 
+          locale, 
+          slug: cat.slug 
+        });
+      }
+    }
+  }
+  return params;
+}
 
 type SubCategoryType = {
   _id: string;
@@ -55,9 +75,15 @@ async function getCategoryDetails(slug: string, locale: string): Promise<Categor
   }
 }
 
-export default async function SubCategoriesPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const locale = await getLocale();
+export default async function SubCategoriesPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string, locale: string }> 
+}) {
+  const { slug, locale } = await params;
+  
+  setRequestLocale(locale);
+  
   const category = await getCategoryDetails(slug, locale);
   const t = await getTranslations("SubCategories"); 
 

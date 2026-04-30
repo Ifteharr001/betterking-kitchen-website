@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-
+import CloudinaryImage from "./CloudinaryImage";
 interface RelatedProductsProps {
   currentProductId: string;
 }
@@ -34,25 +34,40 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
   useEffect(() => {
     const fetchProductsAndCats = async () => {
       try {
-        const [resProd, resCat] = await Promise.all([
-           fetch('/api/products'),
-           fetch('/api/admin/categories') 
-        ]);
+        setLoading(true);
 
-        if (!resProd.ok) throw new Error("Failed to fetch products");
-        
-        const dataProd = await resProd.json();
-        const dataCat = await resCat.json();
-
-        if(dataCat.categories) {
-            setCategories(dataCat.categories);
+        let catData;
+        const cachedCats = sessionStorage.getItem('categories');
+        if (cachedCats) {
+          catData = JSON.parse(cachedCats);
+        } else {
+          const resCat = await fetch('/api/admin/categories');
+          catData = await resCat.json();
+          sessionStorage.setItem('categories', JSON.stringify(catData));
         }
 
-        const filtered = dataProd
-          .filter((p: Product) => p.id !== currentProductId)
-          .slice(0, 4);
+        if (catData && catData.categories) {
+          setCategories(catData.categories);
+        }
 
-        setRelatedProducts(filtered);
+        const resProd = await fetch('/api/products');
+        if (!resProd.ok) throw new Error("Failed to fetch products");
+        const dataProd = await resProd.json();
+
+        const currentProduct = dataProd.find((p: Product) => p.id === currentProductId);
+        const currentCategory = currentProduct?.category;
+
+        let filtered = dataProd.filter((p: Product) => p.id !== currentProductId);
+        
+        if (currentCategory) {
+          const sameCategoryProducts = filtered.filter((p: Product) => p.category === currentCategory);
+          
+          if (sameCategoryProducts.length > 0) {
+            filtered = sameCategoryProducts;
+          }
+        }
+
+        setRelatedProducts(filtered.slice(0, 4));
       } catch (error) {
         console.error("Error loading related products:", error);
       } finally {
@@ -83,12 +98,13 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
             className="group bg-gray-50 border border-gray-200 rounded-xl p-4 hover:border-primary transition-all duration-300"
           >
             <div className="aspect-square bg-white rounded-lg mb-3 flex items-center justify-center overflow-hidden border border-gray-100 relative">
-              <Image 
+              <CloudinaryImage
                 src={product.image} 
                 alt={getLocalizedText(product.name, locale)} 
                 fill 
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
               />
             </div>
             <p className="text-xs text-primary font-medium uppercase tracking-wide mb-1">

@@ -31,7 +31,7 @@ const Hero = () => {
       title: t("slides.1.title"),
       highlight: t("slides.1.highlight"),
       description: t("slides.1.description"),
-      video: "https://res.cloudinary.com/dnrpstwps/video/upload/q_auto:best,f_webm/v1774552363/hero-video-2_njpb03.mp4",
+      video: "https://res.cloudinary.com/dnrpstwps/video/upload/q_auto:eco,f_auto,w_1920,c_scale/v1774552363/hero-video-2_njpb03.mp4",
       image: heroImage,
       overlay: "bg-gradient-to-r from-[#0a1628]/95 via-[#0a1628]/70 to-[#0a1628]/30",
       cta: { 
@@ -45,7 +45,7 @@ const Hero = () => {
       title: t("slides.2.title"),
       highlight: t("slides.2.highlight"),
       description: t("slides.2.description"),
-      video: "https://res.cloudinary.com/dnrpstwps/video/upload/q_auto:best,f_webm/v1774552655/hero-video-3_wxjrsu.mp4",
+      video: "https://res.cloudinary.com/dnrpstwps/video/upload/q_auto:eco,f_auto,w_1920,c_scale/v1774552655/hero-video-3_wxjrsu.mp4",
       image: heroImage,
       overlay: "bg-gradient-to-r from-[#1a3a5c]/90 via-[#1a3a5c]/60 to-[#1a3a5c]/20",
       cta: { 
@@ -109,7 +109,7 @@ const Hero = () => {
             sizes="100vw"
           />
           
-          {slide.video && loadVideos && (
+       {slide.video && loadVideos && index === currentSlide && (
             <video
               key={slide.video}
               autoPlay
@@ -117,6 +117,7 @@ const Hero = () => {
               loop
               playsInline
               preload="metadata"
+              poster={slide.image.src} 
               className="absolute inset-0 w-full h-full object-cover z-[1]"
               onLoadedData={(e) => {
                 (e.target as HTMLVideoElement).play();

@@ -2,11 +2,10 @@ import Footer from "./components/Footer";
 import Header from "./components/Header"; 
 import FloatingContact from "./components/FloatingContact";
 import { Suspense } from "react";
+import { setRequestLocale } from "next-intl/server";
 
-export const revalidate = 60; // Aggressively revalidate every 60 seconds for faster updates
-export const dynamic = 'auto'; // Allow static generation with dynamic content
+export const revalidate = 86400; 
 
-// Loading placeholder for Header
 function HeaderSkeleton() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
@@ -24,11 +23,17 @@ function HeaderSkeleton() {
   );
 }
 
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
+  params, 
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  
+  setRequestLocale(locale);
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground relative">
       

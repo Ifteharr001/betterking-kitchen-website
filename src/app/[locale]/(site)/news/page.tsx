@@ -3,10 +3,17 @@ import Image from "next/image";
 import { Calendar, MapPin, Tag } from "lucide-react";
 import connectDB from "@/lib/db"; 
 import Blog from "@/models/Blog";
-import { getTranslations } from "next-intl/server";
+import CloudinaryImage from "../components/CloudinaryImage";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const revalidate = 120; 
-export const dynamic = 'auto'; 
+export const revalidate = 86400; 
+
+export function generateStaticParams() {
+  return [
+    { locale: 'en' }, { locale: 'bn' }, { locale: 'fr' }, 
+    { locale: 'es' }, { locale: 'ar' }, { locale: 'zh' }
+  ]; 
+}
 
 async function getBlogs(locale: string) {
   try {
@@ -30,8 +37,10 @@ async function getBlogs(locale: string) {
 
 export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const blogs = await getBlogs(locale);
   
+  setRequestLocale(locale);
+
+  const blogs = await getBlogs(locale);
   const t = await getTranslations("NewsPage");
 
   return (
@@ -65,6 +74,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                     alt={blog.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, 300px"
                   />
                 </div>
 

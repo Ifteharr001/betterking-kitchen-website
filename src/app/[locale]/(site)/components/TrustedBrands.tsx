@@ -86,8 +86,7 @@ const TrustedBrands = () => {
                   height={80} 
                   width={120}
                   className="h-10 sm:h-14 md:h-16 lg:h-20 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300 opacity-60 hover:opacity-100"
-                  loading="lazy"
-                  quality={70}
+                  unoptimized={true} 
                 />
               </div>
             ))}

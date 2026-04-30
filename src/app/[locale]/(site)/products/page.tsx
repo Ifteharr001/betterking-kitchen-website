@@ -1,35 +1,33 @@
 import Categories from "../components/Categories";
 import ProductsClient from "./ProductsClient";
 import { Suspense } from "react";
+import { setRequestLocale } from "next-intl/server";
 
-export const revalidate = 60; // Revalidate every 60 seconds for fresh data
-export const dynamic = 'auto'; // Allow static generation
+export const revalidate = 86400; 
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const params = await searchParams;
+export function generateStaticParams() {
+  return [
+    { locale: 'en' }, { locale: 'bn' }, { locale: 'fr' }, 
+    { locale: 'es' }, { locale: 'ar' }, { locale: 'zh' }
+  ]; 
+}
+
+export default async function ProductsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   
-  const isSearchActive = !!(params?.search || params?.q);
-  
-  const isCategoryActive = !!params?.category;
-  
-  const shouldHideCategories = isSearchActive || isCategoryActive;
+  setRequestLocale(locale);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      
-      {!shouldHideCategories && <Categories />}
       
       <Suspense fallback={
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       }>
-        <ProductsClient />
+        <ProductsClient categories={<Categories />} />
       </Suspense>
+      
     </div>
   );
 }

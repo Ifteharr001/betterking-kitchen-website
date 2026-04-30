@@ -16,7 +16,10 @@ export async function GET(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json(product, { status: 200 });
+    const response = NextResponse.json(product, { status: 200 });
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    
+    return response;
 
   } catch (error) {
     return NextResponse.json(

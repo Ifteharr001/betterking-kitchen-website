@@ -1,21 +1,34 @@
-import React, { Suspense } from 'react';
+import React from 'react';
+import { setRequestLocale } from 'next-intl/server';
 import dynamic from 'next/dynamic';
 
-const Hero = dynamic(() => import('./components/Hero'), { ssr: true });
-const Categories = dynamic(() => import('./components/Categories'), { ssr: true });
+import Hero from './components/Hero';
+
+const Categories = dynamic(() => import('./components/Categories'));
 const TrustedBrands = dynamic(() => import('./components/TrustedBrands'));
 const FeaturedProducts = dynamic(() => import('./components/FeaturedProducts'));
 const ProductGrid = dynamic(() => import('./components/ProductGrid'));
 const WhyChooseUs = dynamic(() => import('./components/WhyChooseUs'));
 const Industries = dynamic(() => import('./components/Industries'));
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
-const homePage = () => {
-    return (
-    <div >
+export function generateStaticParams() {
+  return [
+    { locale: 'en' }, { locale: 'bn' }, { locale: 'fr' }, 
+    { locale: 'es' }, { locale: 'ar' }, { locale: 'zh' }
+  ]; 
+}
+
+const homePage = async ({ params }: { params: Promise<{ locale: string }> }) => {
+  const { locale } = await params;
+  
+  setRequestLocale(locale);
+
+  return (
+    <div>
       <Hero />
-      <Categories      />
+      <Categories />
       <TrustedBrands />
       <FeaturedProducts />
       <ProductGrid />

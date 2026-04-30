@@ -4,6 +4,26 @@ import { ArrowLeft } from "lucide-react";
 import connectDB from "@/lib/db";
 import Industry from "@/models/Industry";
 import { getLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
+
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  const locales = ['en', 'bn', 'fr', 'es', 'ar', 'zh'];
+  
+  await connectDB();
+  const industries = await Industry.find({}).select('_id').lean();
+
+  const params = [];
+
+  for (const locale of locales) {
+    for (const ind of industries) {
+      params.push({ locale, id: ind._id.toString() });
+    }
+  }
+
+  return params;
+}
 
 const getLocalizedText = (val: any, locale: string) => {
   if (!val) return "";
@@ -11,9 +31,12 @@ const getLocalizedText = (val: any, locale: string) => {
   return val[locale] || val.en || "";
 };
 
-export default async function IndustryDetails({ params }: { params: Promise<{ id: string }> }) {
+export default async function IndustryDetails({ params }: { params: Promise<{ id: string, locale: string }> }) {
   const { id } = await params;
   const locale = await getLocale();
+  
+  setRequestLocale(locale);
+
   await connectDB();
   const industry = await Industry.findById(id).lean();
 

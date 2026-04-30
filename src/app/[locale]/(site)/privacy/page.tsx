@@ -1,10 +1,21 @@
-import { useTranslations } from "next-intl";
 
-export const revalidate = 86400; // Revalidate every day
-export const dynamic = 'auto';
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export default function PrivacyPolicyPage() {
-  const t = useTranslations("PrivacyPolicy");
+export const revalidate = 86400; 
+
+export function generateStaticParams() {
+  return [
+    { locale: 'en' }, { locale: 'bn' }, { locale: 'fr' }, 
+    { locale: 'es' }, { locale: 'ar' }, { locale: 'zh' }
+  ]; 
+}
+
+export default async function PrivacyPolicyPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  
+  setRequestLocale(locale);
+
+  const t = await getTranslations("PrivacyPolicy");
 
   return (
     <main className="py-20 md:py-32 bg-gray-50 min-h-screen mt-16">

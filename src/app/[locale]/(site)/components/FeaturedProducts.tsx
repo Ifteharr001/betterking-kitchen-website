@@ -58,7 +58,7 @@ const FeaturedProducts = () => {
                 width={400}
                 height={400}
                 className="max-w-full max-h-[180px] md:max-h-[240px] object-contain group-hover:scale-105 transition-transform duration-500"
-                loading="lazy"
+                priority 
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 quality={85}
               />
@@ -80,12 +80,12 @@ const FeaturedProducts = () => {
             href={`/${locale}/products`} 
             className="group relative rounded-xl overflow-hidden sm:row-span-2 lg:row-span-2 min-h-[300px] sm:min-h-[400px] lg:min-h-0"
           >
-            <Image 
+           <Image 
               src={heroKitchen} 
               alt="Kitchen Accessories"
               fill
               className="object-cover transition-transform duration-700 group-hover:scale-110"
-              loading="lazy"
+              priority 
               quality={85}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
             />
@@ -112,7 +112,7 @@ const FeaturedProducts = () => {
               alt="Modern Kitchen"
               fill
               className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
-              loading="lazy"
+              priority
               quality={85}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
             />
@@ -135,6 +135,7 @@ const FeaturedProducts = () => {
               src={productMixer} 
               alt="Kitchen Essentials"
               fill
+              priority
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
             />

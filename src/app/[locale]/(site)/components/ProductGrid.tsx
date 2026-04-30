@@ -2,6 +2,7 @@ import { ArrowRight, Eye, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import connectDB from "@/lib/db";
+import CloudinaryImage from "./CloudinaryImage";
 import ProductModel from "@/models/Product"; 
 import CategoryModel from "@/models/Category";
 
@@ -77,9 +78,9 @@ const ProductGrid = async () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
+       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
           {products.length > 0 ? (
-            products.map((product) => (
+            products.map((product, index) => (
               <Link
                 key={product.id}
                 href={`/${locale}/product/${product.id}`} 
@@ -87,13 +88,15 @@ const ProductGrid = async () => {
                 aria-label={`View details for ${getLocalizedText(product.name, 'en')}`}
               >
                 <div className="bg-gray-100 flex items-center justify-center p-4 aspect-square overflow-hidden relative">
-                  <Image
+                  <CloudinaryImage
                     src={product.image}
                     alt={getLocalizedText(product.name, locale) || "Product Image"}
                     fill
                     className="object-contain p-4 group-hover:scale-110 transition-transform duration-500"
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                    loading="lazy"
+                   
+                    priority={index < 4}
+                    loading={index < 4 ? undefined : "lazy"}
                     quality={85}
                   />
                 </div>

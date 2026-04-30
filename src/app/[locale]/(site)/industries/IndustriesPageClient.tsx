@@ -7,6 +7,16 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
+// Cloudinary Loader Function
+const cloudinaryLoader = ({ src, width }: { src: string, width: number }) => {
+  if (src.includes('res.cloudinary.com')) {
+    return src.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+  }
+  return src;
+};
+
+
+
 const getLocalizedText = (val: any, locale: string) => {
   if (!val) return "";
   if (typeof val === 'string') return val;
@@ -139,13 +149,16 @@ function IndustriesPageClient() {
                     key={industry._id}
                     className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group"
                   >
-                    <div className="relative h-48 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden">
                       <Image
+                      loader={cloudinaryLoader}
                         src={industry.image}
                         alt={getLocalizedText(industry.name, locale)}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                       
+                        priority={industries.indexOf(industry) < 3} 
                       />
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
                     </div>

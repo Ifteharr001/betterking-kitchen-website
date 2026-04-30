@@ -86,7 +86,6 @@ const AdminQuotes = () => {
     }
   };
 
-  // ৩. অর্ডার রিজেক্ট করা
   const handleReject = async (id: string) => {
     setActionLoading(true);
     try {
