@@ -15,20 +15,38 @@ export function generateStaticParams() {
   ]; 
 }
 
+const generateSeoSlug = (text: string) => {
+  if (!text) return "";
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')       
+    .replace(/[^\w\-]+/g, '')   
+    .replace(/\-\-+/g, '-');    
+};
+
 async function getBlogs(locale: string) {
   try {
     await connectDB();
     const blogs = await Blog.find({}).sort({ createdAt: -1 }).lean();
     
-    return blogs.map((blog: any) => ({
-      ...blog,
-      _id: blog._id.toString(),
-      createdAt: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : "N/A",
-      title: blog.title?.[locale] || blog.title?.en || "",
-      category: blog.category?.[locale] || blog.category?.en || "",
-      location: blog.location?.[locale] || blog.location?.en || "",
-      shortDesc: blog.shortDesc?.[locale] || blog.shortDesc?.en || "",
-    }));
+    return blogs.map((blog: any) => {
+      
+      const rawTitleOrSlug = blog.slug || blog.title?.en || blog.title?.[locale] || "";
+      const cleanSeoSlug = generateSeoSlug(rawTitleOrSlug);
+
+      return {
+        ...blog,
+        _id: blog._id.toString(),
+        createdAt: blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : "N/A",
+        title: blog.title?.[locale] || blog.title?.en || "",
+        category: blog.category?.[locale] || blog.category?.en || "",
+        location: blog.location?.[locale] || blog.location?.en || "",
+        shortDesc: blog.shortDesc?.[locale] || blog.shortDesc?.en || "",
+        seoSlug: cleanSeoSlug, 
+      };
+    });
   } catch (error) {
     console.error("Error fetching blogs:", error);
     return [];
@@ -69,7 +87,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                 className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex flex-col md:flex-row group"
               >
                 <div className="w-full md:w-72 h-48 md:h-auto relative shrink-0 overflow-hidden">
-                  <Image
+                  <CloudinaryImage
                     src={blog.image || "/placeholder.jpg"} 
                     alt={blog.title}
                     fill
@@ -110,7 +128,7 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
                   </p>
 
                   <Link 
-                    href={`/${locale}/news/${blog.slug}`} 
+                    href={`/${locale}/news/${blog.seoSlug}`} 
                     className="inline-flex items-center justify-center bg-black text-white text-xs font-bold px-5 py-2.5 rounded hover:bg-primary hover:text-white transition-colors w-fit"
                   >
                     {t('readMore')}

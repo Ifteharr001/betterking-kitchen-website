@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Script from 'next/script';
 import { Inter } from "next/font/google";
-import "../globals.css";
+import '../globals.css';
 import NextTopLoader from 'nextjs-toploader';
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
@@ -15,6 +16,9 @@ export const metadata: Metadata = {
   description: "Betterking Kitchen",
   icons: {
     icon: "/white-logo.webp", 
+  },
+  verification: {
+    google: "VhJlRr3WFXCWlOhxiSQeKsvQ8kxzI_NhPWBA-5ktwLw",
   },
 };
 
@@ -39,6 +43,17 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={cn(inter.className, "antialiased")} suppressHydrationWarning>
+        
+      <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8MVLDN3L5D"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-8MVLDN3L5D');
+</script>
+
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
           <NextTopLoader color="#D4AF37" height={3} showSpinner={false} />

@@ -1,12 +1,22 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Blog from "@/models/Blog";
+import { revalidatePath } from "next/cache";
 
 async function translateText(text: string, targetLang: string) {
   if (!text) return "";
   try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t`;
+    
+    
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ q: text }).toString(), 
+    });
+    
     const data = await res.json();
     return data[0].map((item: any) => item[0]).join('');
   } catch (error) {
@@ -40,6 +50,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ message: "Error fetching blog" }, { status: 500 });
   }
 }
+
+// PUT Request
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params; 
@@ -69,6 +81,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     };
 
     const updatedBlog = await Blog.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+    revalidatePath('/', 'layout');
     
     if (!updatedBlog) return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     return NextResponse.json({ message: "Blog updated successfully", blog: updatedBlog }, { status: 200 });
@@ -84,6 +97,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     await connectDB();
     
     const deletedBlog = await Blog.findByIdAndDelete(id);
+    revalidatePath('/', 'layout');
     if (!deletedBlog) return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     
     return NextResponse.json({ message: "Blog deleted successfully" }, { status: 200 });

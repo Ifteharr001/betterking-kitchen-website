@@ -1,14 +1,22 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
+import { revalidatePath } from "next/cache";
 import Blog from "@/models/Blog";
 
 async function translateText(text: string, targetLang: string) {
   if (!text) return "";
   try {
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t`;
     
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ q: text }).toString(), 
+    });
+    
+    const data = await res.json();
     return data[0].map((item: any) => item[0]).join('');
   } catch (error) {
     console.error(`Error translating to ${targetLang}:`, error);
@@ -77,6 +85,7 @@ export async function POST(req: Request) {
     };
 
     const newBlog = await Blog.create(blogData);
+    revalidatePath('/', 'layout');
     return NextResponse.json({ message: "Blog created & translated successfully", blog: newBlog }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: "Error creating blog", error }, { status: 500 });

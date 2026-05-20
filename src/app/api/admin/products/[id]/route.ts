@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
+import { revalidatePath } from "next/cache";
 
 async function translateText(text: string, targetLang: string) {
   if (!text) return "";
@@ -75,7 +76,7 @@ export async function PUT(
       { $set: updateData },
       { returnDocument: 'after', runValidators: true } 
     );
-
+revalidatePath('/', 'layout');
     if (!updatedProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
@@ -99,6 +100,7 @@ export async function DELETE(
     await connectDB();
 
     const deletedProduct = await Product.findOneAndDelete({ id: id });
+    revalidatePath('/', 'layout');
 
     if (!deletedProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });

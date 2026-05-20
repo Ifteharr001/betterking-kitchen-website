@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import ImageUpload from "@/components/ImageUpload";
+
+// @ts-ignore
+import "react-quill-new/dist/quill.snow.css"; 
+const ReactQuill = dynamic(() => import("react-quill-new"), { 
+  ssr: false, 
+  loading: () => <p className="text-gray-500 text-sm">Loading editor...</p> 
+}) as React.ComponentType<any>;
 
 export default function EditNewsPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -31,6 +39,16 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
     shortDesc: "",
     description: "",
   });
+
+  const modules = useMemo(() => ({
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['link', 'blockquote'],
+      ['clean']
+    ],
+  }), []);
 
   useEffect(() => {
     if (!id) {
@@ -71,6 +89,10 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, description: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -194,13 +216,16 @@ export default function EditNewsPage({ params }: { params: Promise<{ id: string 
             </div>
 
             <div className="space-y-2 text-black">
-              <Label htmlFor="description">Full Content</Label>
-              <Textarea 
-                id="description" name="description" 
-                value={formData.description} onChange={handleChange}
-                placeholder="Write your full article here..." rows={10} required 
-                className="text-black font-mono text-sm border-gray-300 focus:ring-primary focus:border-primary"
-              />
+              <Label className="text-gray-700">Full Content <span className="text-red-500">*</span></Label>
+              <div className="bg-white [&_.ql-editor]:min-h-[300px] [&_.ql-editor]:text-base [&_.ql-container]:border-gray-300 [&_.ql-toolbar]:border-gray-300 rounded-md overflow-hidden pb-12">
+                <ReactQuill 
+                  theme="snow"
+                  value={formData.description} 
+                  onChange={handleDescriptionChange} 
+                  modules={modules} 
+                  placeholder="Write your full article here..."
+                />
+              </div>
             </div>
 
             <div className="flex justify-end pt-4 border-t border-gray-100">

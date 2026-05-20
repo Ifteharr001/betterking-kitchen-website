@@ -58,44 +58,17 @@ const AdminDashboard = () => {
   const [recentQuotes, setRecentQuotes] = useState<Quote[]>([]);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
 
-  const fetchDashboardData = async () => {
+const fetchDashboardData = async () => {
     try {
-      const [prodRes, orderRes, contactRes, quotesRes] = await Promise.all([
-        fetch("/api/admin/products"),
-        fetch("/api/admin/orders").catch(() => ({ json: () => [] })),
-        fetch("/api/contact"),
-        fetch("/api/admin/quotes").catch(() => ({ json: () => [] })) 
-      ]);
+      const res = await fetch("/api/admin/dashboard");
+      const data = await res.json();
 
-      const products = await prodRes.json();
-      const orders = await (orderRes as any).json();
-      const contacts = await contactRes.json();
-      const quotes = await (quotesRes as any).json();
-
-      const activeProds = Array.isArray(products) ? products.length : 0; 
-      const processingOrds = Array.isArray(orders) ? orders.filter((o: any) => o.status === "processing").length : 0;
-      
-      const totalContacts = Array.isArray(contacts) ? contacts.length : 0;
-      const pendingContacts = Array.isArray(contacts) ? contacts.filter((c: any) => c.status === "unread").length : 0;
-
-      const totalQuotesCount = Array.isArray(quotes) ? quotes.length : 0;
-      const pendingQuotesCount = Array.isArray(quotes) ? quotes.filter((q: any) => q.status === "pending").length : 0;
-      
-      setStats({
-        totalProducts: Array.isArray(products) ? products.length : 0,
-        activeProducts: activeProds,
-        totalInquiries: totalContacts,
-        pendingInquiries: pendingContacts, 
-        totalQuotes: totalQuotesCount,
-        pendingQuotes: pendingQuotesCount,
-        totalOrders: Array.isArray(orders) ? orders.length : 0,
-        processingOrders: processingOrds,
-      });
-
-      if (Array.isArray(contacts)) setRecentInquiries(contacts);
-      if (Array.isArray(quotes)) setRecentQuotes(quotes); 
-      if (Array.isArray(orders)) setRecentOrders(orders);
-
+      if (res.ok) {
+        setStats(data.stats);
+        setRecentInquiries(data.recentInquiries || []);
+        setRecentQuotes(data.recentQuotes || []);
+        setRecentOrders(data.recentOrders || []);
+      }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {

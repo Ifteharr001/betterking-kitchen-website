@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Industry from "@/models/Industry";
+import { revalidatePath } from "next/cache";
 
 // Auto translator function
 async function translateText(text: string, targetLang: string) {
@@ -76,6 +77,7 @@ export async function PUT(
     await connectDB();
 
     const existingIndustry = await Industry.findById(id).lean();
+    revalidatePath('/', 'layout');
     if (!existingIndustry) {
       return NextResponse.json({ error: "Industry not found" }, { status: 404 });
     }
@@ -161,6 +163,7 @@ export async function DELETE(
     await connectDB();
 
     const deletedIndustry = await Industry.findByIdAndDelete(id);
+    revalidatePath('/', 'layout');
 
     if (!deletedIndustry) {
       return NextResponse.json({ error: "Industry not found" }, { status: 404 });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Product from "@/models/Product";
-
+import { revalidatePath } from "next/cache";
 async function translateText(text: string, targetLang: string) {
   if (!text) return "";
   try {
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     };
 
     const newProduct = await Product.create(payload);
-
+revalidatePath('/', 'layout');
     return NextResponse.json(
       { message: "Product created & translated successfully", product: newProduct },
       { status: 201 }

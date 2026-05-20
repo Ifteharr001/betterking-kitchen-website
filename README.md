@@ -404,6 +404,6 @@ For support, issues, or feature requests:
 
 ---
 
-**Made with ❤️ by [Iftehar](https://github.com/Ifteharr001)**
+**Made with ❤️ by [Iftehar Rahat](https://github.com/Ifteharr001)**
 
 Last Updated: April 27, 2026

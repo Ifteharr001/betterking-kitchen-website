@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Industry from "@/models/Industry";
+import { revalidatePath } from "next/cache";
 
 // Auto translator function
 async function translateText(text: string, targetLang: string) {
@@ -94,6 +95,7 @@ export async function POST(req: Request) {
     };
 
     const newIndustry = await Industry.create(payload);
+    revalidatePath('/', 'layout');
     
     return NextResponse.json(newIndustry, { status: 201 });
   } catch (error) {
