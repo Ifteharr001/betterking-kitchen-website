@@ -26,22 +26,23 @@ const AdminLogin = () => {
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: true,
-        callbackUrl: "/admin/dashboard",
+        redirect: false, 
       });
+      // console.log("NextAuth Result: ", result);
 
       if (result?.error) {
         toast({
           title: "Login Failed",
-          description: "Invalid email or password.",
+          description: result.error || "Invalid email or password.", 
           variant: "destructive",
         });
-        setLoading(false);
-      } else {
+        setLoading(false); 
+      } else if (result?.ok) {
         toast({
           title: "Welcome back!",
           description: "Login successful.",
         });
+
         router.push("/admin/dashboard");
       }
     } catch (error) {

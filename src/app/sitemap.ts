@@ -17,18 +17,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return { languages };
   };
 
-  let categories = [];
+  let categories: any[] = [];
   try {
     const res = await fetch(`${baseUrl}/api/categories`); 
     if (res.ok) {
-      categories = await res.json();
+      const data = await res.json();
+      categories = Array.isArray(data) ? data : data.data || data.categories || [];
     }
   } catch (error) {
     console.error("Sitemap Category Fetch Error:", error);
   }
 
   const categoryUrls = categories.map((cat: any) => {
-    const path = `/categories/${cat.slug}`;
+    const path = `/categories/${cat.slug || cat._id}`;
     return {
       url: `${baseUrl}${path}`,
       lastModified: new Date(),
@@ -38,8 +39,57 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
+  let products: any[] = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/products`); 
+    if (res.ok) {
+      const data = await res.json();
+      products = Array.isArray(data) ? data : data.data || data.products || [];
+    }
+  } catch (error) {
+    console.error("Sitemap Product Fetch Error:", error);
+  }
+
+  const productUrls = products.map((prod: any) => {
+    const path = `/product/${prod.id}`; 
+    return {
+      url: `${baseUrl}${path}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+      alternates: getAlternates(path),
+    };
+  });
+
+  let blogs: any[] = [];
+  try {
+    const res = await fetch(`${baseUrl}/api/admin/news`);
+    if (res.ok) {
+      const data = await res.json();
+      blogs = Array.isArray(data) ? data : data.data || data.news || data.blogs || [];
+    }
+  } catch (error) {
+    console.error("Sitemap Blog Fetch Error:", error);
+  }
+
+  const blogUrls = blogs.map((blog: any) => {
+    
+    let safeSlug = blog.slug 
+      ? blog.slug.toString().trim().replace(/\s+/g, '-') 
+      : blog._id;
+
+    const path = `/news/${safeSlug}`; 
+    return {
+      url: `${baseUrl}${path}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7, 
+      alternates: getAlternates(path),
+    };
+  });
+
   const staticRoutes = [
-    '', // Home page
+    '', 
     '/products',
     '/solutions',
     '/industries',
@@ -61,5 +111,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     alternates: getAlternates(route),
   }));
 
-  return [...staticUrls, ...categoryUrls];
+  return [...staticUrls, ...categoryUrls, ...productUrls, ...blogUrls];
 }

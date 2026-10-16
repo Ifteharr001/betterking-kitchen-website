@@ -29,6 +29,13 @@ const handler = NextAuth({
         }
 
         const isMatch = await bcrypt.compare(credentials.password, user.password);
+//         console.log("Entered Password: ", credentials.password);
+// console.log("DB Hash: ", user.password);
+// console.log("Did it match?: ", isMatch);
+
+if (!isMatch) {
+  throw new Error("Invalid email or password");
+}
 
         if (!isMatch) {
           throw new Error("Invalid email or password");

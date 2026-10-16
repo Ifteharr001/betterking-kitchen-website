@@ -22,7 +22,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 export function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'bn' }, { locale: 'fr' }, { locale: 'es' }, { locale: 'ar' }, { locale: 'zh' }]; 
 }
@@ -44,15 +43,16 @@ export default async function RootLayout({
     <html lang={locale} suppressHydrationWarning>
       <body className={cn(inter.className, "antialiased")} suppressHydrationWarning>
         
-      <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8MVLDN3L5D"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-8MVLDN3L5D');
-</script>
+        {/* Google Analytics Scripts*/}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-8MVLDN3L5D" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-8MVLDN3L5D');
+          `}
+        </Script>
 
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
