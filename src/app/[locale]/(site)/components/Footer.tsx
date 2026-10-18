@@ -1,9 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { getTranslations, getLocale } from "next-intl/server";
-import connectDB from "@/lib/db";
-import CategoryModel from "@/models/Category";
+import { useLocale, useTranslations } from "next-intl";
+import { setSessionCache } from "@/lib/browserStorage";
 
 const getLocalizedText = (val: any, locale: string) => {
   if (!val) return "";
@@ -11,24 +13,40 @@ const getLocalizedText = (val: any, locale: string) => {
   return val[locale] || val.en || "";
 };
 
-async function getCategories() {
-  try {
-    await connectDB();
-    const categories = await CategoryModel.find({}).sort({ createdAt: -1 }).limit(5).lean();
-    return categories.map((cat: any) => ({
-      ...cat,
-      _id: cat._id.toString(),
-    }));
-  } catch (error) {
-    console.error("Error fetching categories for footer:", error);
-    return [];
-  }
-}
+const Footer = () => {
+  const t = useTranslations("Footer");
+  const locale = useLocale();
+  const [categories, setCategories] = useState<any[]>([]);
 
-const Footer = async () => {
-  const t = await getTranslations("Footer");
-  const locale = await getLocale();
-  const categories = await getCategories();
+  useEffect(() => {
+    let isActive = true;
+
+    try {
+      const cachedCategories = sessionStorage.getItem("categories");
+      if (cachedCategories) {
+        const parsedCategories = JSON.parse(cachedCategories);
+        if (Array.isArray(parsedCategories)) setCategories(parsedCategories);
+      }
+    } catch (error) {
+      console.error("Failed to parse cached footer categories", error);
+      sessionStorage.removeItem("categories");
+    }
+
+    fetch("/api/categories", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Categories request failed: ${response.status}`);
+        const data = await response.json();
+        if (isActive && Array.isArray(data)) {
+          setCategories(data);
+          setSessionCache("categories", data);
+        }
+      })
+      .catch((error) => console.error("Error fetching categories for footer:", error));
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <footer className="bg-[#0a1628] text-white">

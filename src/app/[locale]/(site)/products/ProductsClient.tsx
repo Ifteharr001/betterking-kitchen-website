@@ -72,23 +72,14 @@ export default function ProductsClient({ categories }: { categories: React.React
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProducts = async () => {
       try {
         setLoading(true);
-        const [prodRes, catRes] = await Promise.all([
-          fetch("/api/products"),
-          fetch("/api/admin/categories")
-        ]);
-        
+        const prodRes = await fetch("/api/products");
         if (!prodRes.ok) throw new Error("Failed to fetch products");
-        
+
         const productsData = await prodRes.json();
-        const catData = await catRes.json();
-        
-        setAllProducts(productsData);
-        if (catData.categories) {
-          setCategoriesData(catData.categories);
-        }
+        setAllProducts(Array.isArray(productsData) ? productsData : []);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -96,11 +87,24 @@ export default function ProductsClient({ categories }: { categories: React.React
       }
     };
 
-    fetchData();
+    const fetchCategories = async () => {
+      try {
+        const catRes = await fetch("/api/categories?metadata=1", { cache: "force-cache" });
+        if (!catRes.ok) return;
+
+        const catData = await catRes.json();
+        setCategoriesData(Array.isArray(catData) ? catData : []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchProducts();
+     fetchCategories();
   }, []);
 
   useEffect(() => {
-    if (allProducts.length === 0 || categoriesData.length === 0) return;
+    if (allProducts.length === 0) return;
 
     let result = [...allProducts];
 

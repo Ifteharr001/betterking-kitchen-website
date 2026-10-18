@@ -1,11 +1,16 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import connectDB from "@/lib/db";
-import IndustryModel from "@/models/Industry";
-import { getLocale, getTranslations } from "next-intl/server"; 
+import { useLocale, useTranslations } from "next-intl";
 
- 
-export const revalidate = 86400;
+type Industry = {
+  _id: string;
+  name: Record<string, string> | string;
+  description: Record<string, string> | string;
+  image: string;
+};
 
 const getLocalizedText = (val: any, locale: string) => {
   if (!val) return "";
@@ -13,24 +18,31 @@ const getLocalizedText = (val: any, locale: string) => {
   return val[locale] || val.en || "";
 };
 
-async function getIndustries() {
-  try {
-    await connectDB();
-    const industries = await IndustryModel.find({}).sort({ createdAt: -1 }).limit(3).lean();
-    return industries.map((ind: any) => ({
-      ...ind,
-      _id: ind._id.toString(),
-    }));
-  } catch (error) {
-    console.error("Error fetching industries:", error);
-    return [];
-  }
-}
+const Industries = () => {
+  const locale = useLocale();
+  const t = useTranslations("Industries");
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-const Industries = async () => {
-  const industries = await getIndustries();
-  const locale = await getLocale(); 
-  const t = await getTranslations("Industries"); 
+  useEffect(() => {
+    let isActive = true;
+
+    fetch("/api/industries?limit=3", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Industries request failed: ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data.industries)) throw new Error("Industries response was invalid");
+        if (isActive) setIndustries(data.industries);
+      })
+      .catch((error) => console.error("Error fetching industries:", error))
+      .finally(() => {
+        if (isActive) setIsLoaded(true);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <section className="py-12 md:py-20 relative overflow-hidden" style={{
@@ -69,9 +81,14 @@ const Industries = async () => {
 
           <div className="lg:col-span-8">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {industries.length > 0 ? (
-                // ফিক্স: ম্যাপ ফাংশনে index রিসিভ করছি
-                industries.map((industry: any, index: number) => (
+              {!isLoaded ? (
+                <div className="col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4" aria-label="Loading industries" aria-busy="true">
+                  {Array.from({ length: 3 }, (_, index) => (
+                    <div key={index} className="h-60 sm:h-80 rounded-xl bg-gray-200 animate-pulse" />
+                  ))}
+                </div>
+              ) : industries.length > 0 ? (
+                industries.map((industry, index) => (
                   <Link 
                     href={`/${locale}/industries/${industry._id}`} 
                     key={industry._id}

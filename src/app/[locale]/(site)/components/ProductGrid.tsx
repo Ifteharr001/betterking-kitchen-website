@@ -1,19 +1,16 @@
-import { ArrowRight, Eye, ExternalLink } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import connectDB from "@/lib/db";
-import CloudinaryImage from "./CloudinaryImage";
-import ProductModel from "@/models/Product"; 
-import CategoryModel from "@/models/Category";
+"use client";
 
-import { getLocale, getTranslations } from "next-intl/server";
- 
-export const revalidate = 86400; 
+import { useEffect, useState } from "react";
+import { ArrowRight, Eye, ExternalLink, Loader2 } from "lucide-react";
+import Link from "next/link";
+import CloudinaryImage from "./CloudinaryImage";
+import { useLocale, useTranslations } from "next-intl";
+import { setSessionCache } from "@/lib/browserStorage";
 
 interface Product {
   id: string;
-  name: any; 
-  category: any; 
+  name: any;
+  category: any;
   image: string;
   price: number | string;
 }
@@ -24,38 +21,82 @@ const getLocalizedText = (val: any, locale: string) => {
   return val[locale] || val.en || "";
 };
 
-async function getProducts() {
-  try {
-    await connectDB();
+const ProductGrid = () => {
+  const locale = useLocale();
+  const t = useTranslations("ProductGrid");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-    const [products, categories] = await Promise.all([
-      ProductModel.find({}).sort({ createdAt: -1 }).limit(8).lean(),
-      CategoryModel.find({}).lean()
-    ]);
+  useEffect(() => {
+    let isActive = true;
+    let fetchedProducts: any[] = [];
+    let cachedCategories: any[] = [];
 
-    return products.map((product: any) => {
+    try {
+      const cachedProducts = sessionStorage.getItem("products");
+      if (cachedProducts) {
+        const parsedProducts = JSON.parse(cachedProducts);
+        if (Array.isArray(parsedProducts)) setProducts(parsedProducts);
+      }
+      const cachedCategoryData = sessionStorage.getItem("categories");
+      if (cachedCategoryData) {
+        const parsedCategories = JSON.parse(cachedCategoryData);
+        if (Array.isArray(parsedCategories)) cachedCategories = parsedCategories;
+      }
+    } catch (error) {
+      console.error("Failed to parse cached product data", error);
+      sessionStorage.removeItem("products");
+      sessionStorage.removeItem("categories");
+    }
+
+    const normalizeProducts = (data: any[], categories: any[]) => data.map((product) => {
       const matchingCategory = categories.find(
-        (cat: any) => cat._id.toString() === product.category
+        (category: any) => String(category._id) === String(product.category)
       );
-
       return {
         ...product,
-        id: product.id || product._id.toString(),
-        _id: product._id.toString(),
-        category: matchingCategory ? matchingCategory.name : product.category, 
+        category: matchingCategory?.name || "",
       };
     });
 
-  } catch (error) {
-    console.error("Error loading products:", error);
-    return [];
-  }
-}
+    const categoriesRequest = fetch("/api/categories", { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : [])
+      .then((categories) => {
+        if (!isActive || !Array.isArray(categories)) return;
+        cachedCategories = categories;
+        if (fetchedProducts.length > 0) {
+          const categorizedProducts = normalizeProducts(fetchedProducts, cachedCategories);
+          setProducts(categorizedProducts);
+          setSessionCache("products", categorizedProducts);
+        }
+      })
+      .catch((error) => console.error("Failed to load product categories", error));
 
-const ProductGrid = async () => {
-  const products: Product[] = await getProducts();
-  const locale = await getLocale(); 
-  const t = await getTranslations("ProductGrid"); 
+    fetch("/api/products?limit=8", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Products request failed: ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data)) throw new Error("Products response was not an array");
+        return data;
+      })
+      .then((data) => {
+        if (!isActive) return;
+        fetchedProducts = data;
+        const normalizedProducts = normalizeProducts(fetchedProducts, cachedCategories);
+        setProducts(normalizedProducts);
+        setSessionCache("products", normalizedProducts);
+      })
+      .catch((error) => console.error("Error loading products:", error))
+      .finally(() => {
+        if (isActive) setIsLoaded(true);
+      });
+
+    void categoriesRequest;
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <section className="py-12 md:py-20" style={{ background: "hsl(216, 54%, 10%)" }}>
@@ -79,7 +120,23 @@ const ProductGrid = async () => {
         </div>
 
        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
-          {products.length > 0 ? (
+          {!isLoaded && products.length === 0 ? (
+            <>
+              <div className="col-span-full flex justify-center py-2" role="status" aria-label="Loading products">
+                <Loader2 className="h-6 w-6 animate-spin text-[#D4AF37]" />
+              </div>
+              {Array.from({ length: 8 }, (_, index) => (
+                <div key={index} className="overflow-hidden rounded-xl bg-white" aria-hidden="true">
+                  <div className="aspect-square animate-pulse bg-gray-200" />
+                  <div className="space-y-2 p-4">
+                    <div className="h-3 w-1/3 animate-pulse rounded bg-gray-200" />
+                    <div className="h-4 w-4/5 animate-pulse rounded bg-gray-200" />
+                    <div className="h-8 animate-pulse rounded bg-gray-100" />
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : products.length > 0 ? (
             products.map((product, index) => (
               <Link
                 key={product.id}

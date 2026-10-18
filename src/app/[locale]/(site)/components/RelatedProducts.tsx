@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import CloudinaryImage from "./CloudinaryImage";
+import { setSessionCache } from "@/lib/browserStorage";
 interface RelatedProductsProps {
   currentProductId: string;
 }
@@ -43,7 +44,7 @@ const RelatedProducts = ({ currentProductId }: RelatedProductsProps) => {
         } else {
           const resCat = await fetch('/api/admin/categories');
           catData = await resCat.json();
-          sessionStorage.setItem('categories', JSON.stringify(catData));
+          setSessionCache("categories", catData);
         }
 
         if (catData && catData.categories) {

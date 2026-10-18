@@ -1,14 +1,14 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronRight, Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SubCategoryGrid from "./SubCategoryGrid";
 import dbConnect from "@/lib/db";
 import Category from "@/models/Category";
 import SubCategory from "@/models/SubCategory";
 
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const revalidate = 86400; 
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   const locales = ['en', 'bn', 'fr', 'es', 'ar', 'zh'];
@@ -41,6 +41,7 @@ type CategoryData = {
   _id: string;
   name: string;
   description: string;
+  image: string;
   subCategories: SubCategoryType[];
 };
 
@@ -53,20 +54,26 @@ const getLocalizedText = (val: any, locale: string) => {
 async function getCategoryDetails(slug: string, locale: string): Promise<CategoryData | null> {
   try {
     await dbConnect();
-    const category = await Category.findOne({ slug }).lean();
+    const category = await Category.findOne({ slug }).select("_id name description").lean();
     if (!category) return null;
 
-    const subCategories = await SubCategory.find({ categoryId: category._id }).lean();
+    const subCategories = await SubCategory.find({ categoryId: category._id })
+      .select("_id name slug")
+      .lean();
+
+    const categoryId = category._id.toString();
+    const categoryImage = `/api/categories/${categoryId}/image`;
 
     return {
       _id: category._id.toString(),
       name: getLocalizedText(category.name, locale),
       description: getLocalizedText(category.description, locale),
+      image: categoryImage,
       subCategories: subCategories.map((sub: any) => ({
         _id: sub._id.toString(),
         name: getLocalizedText(sub.name, locale),
         slug: sub.slug,
-        image: sub.image && sub.image !== "" ? sub.image : "/placeholder.svg",
+        image: `/api/subcategories/${sub._id}/image`,
       })),
     };
   } catch (error) {
@@ -128,26 +135,12 @@ export default async function SubCategoriesPage({
             <p className="text-gray-500">{t("noSubCategories")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
-            {category.subCategories.map((sub) => (
-              <Link href={`/${locale}/products?category=${slug}&subcategory=${sub.slug}`} key={sub._id}>
-                <div className="bg-white rounded-xl p-4 text-center group border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300 h-full flex flex-col">
-                  <div className="w-24 h-24 mx-auto mb-4 rounded-lg overflow-hidden bg-gray-50 relative">
-                    <Image 
-                      src={sub.image} 
-                      alt={sub.name} 
-                      fill
-                      sizes="(max-width: 768px) 96px, 96px"
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-semibold text-gray-900 text-sm md:text-base group-hover:text-primary transition-colors mt-auto">
-                    {sub.name}
-                  </h3>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <SubCategoryGrid
+            locale={locale}
+            categorySlug={slug}
+            fallbackImage={category.image}
+            subCategories={category.subCategories}
+          />
         )}
         
       </div>

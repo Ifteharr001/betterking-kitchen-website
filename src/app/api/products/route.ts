@@ -32,13 +32,19 @@ export async function GET(req: Request) {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
+    const requestedLimit = Number(searchParams.get("limit"));
 
-    let query = {};
-    if (category) query = { category: category.toUpperCase() };
+    const query = category ? { category } : {};
 
-    const products = await Product.find(query).sort({ createdAt: -1 }); 
+    const productQuery = Product.find(query)
+      .select("id name category subCategory image description price")
+      .sort({ createdAt: -1 });
+    if (Number.isInteger(requestedLimit) && requestedLimit > 0) {
+      productQuery.limit(Math.min(requestedLimit, 100));
+    }
+    const products = await productQuery.lean();
     const response = NextResponse.json(products.map(p => ({
-      ...p.toObject(),
+      ...p,
       id: p.id || p._id.toString()
     })), { status: 200 });
     response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');

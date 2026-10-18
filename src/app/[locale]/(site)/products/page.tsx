@@ -3,7 +3,7 @@ import ProductsClient from "./ProductsClient";
 import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
 
-export const revalidate = 86400; 
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return [

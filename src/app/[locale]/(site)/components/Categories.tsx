@@ -1,37 +1,58 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import dbConnect from "@/lib/db";
-import Category from "@/models/Category";
-import SubCategory from "@/models/SubCategory";
+import { useLocale, useTranslations } from "next-intl";
+import { setSessionCache } from "@/lib/browserStorage";
 
-import { getLocale, getTranslations } from "next-intl/server";
+type Category = {
+  _id: string;
+  name: Record<string, string>;
+  slug: string;
+  image?: string;
+  subCategoryCount?: number;
+};
 
-async function getCategories(locale: string) {
-  try {
-    await dbConnect();
-    const categories = await Category.find({}).lean();
-    const subCategories = await SubCategory.find({}).lean();
+export default function Categories() {
+  const locale = useLocale();
+  const t = useTranslations("Categories");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-    return categories.map((cat: any) => ({
-      _id: cat._id.toString(),
-      name: cat.name?.[locale] || cat.name?.en || "", 
-      slug: cat.slug,
-      image: cat.image && cat.image !== "" ? cat.image : "/placeholder.svg",
-      subCategories: subCategories.filter(
-        (sub: any) => String(sub.categoryId) === String(cat._id)
-      )
-    }));
-  } catch (error) {
-    console.error("Failed to fetch categories", error);
-    return [];
-  }
-}
+  useEffect(() => {
+    let isActive = true;
 
-export default async function Categories() {
-  const locale = await getLocale();
-  const categories = await getCategories(locale);
- 
-  const t = await getTranslations("Categories"); 
+    try {
+      const cachedCategories = sessionStorage.getItem("categories");
+      if (cachedCategories) {
+        const parsedCategories = JSON.parse(cachedCategories);
+        if (Array.isArray(parsedCategories)) setCategories(parsedCategories);
+      }
+    } catch (error) {
+      console.error("Failed to parse cached categories", error);
+      sessionStorage.removeItem("categories");
+    }
+
+    fetch("/api/categories", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Categories request failed: ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data)) throw new Error("Categories response was not an array");
+        if (isActive) {
+          setCategories(data);
+          setSessionCache("categories", data);
+        }
+      })
+      .catch((error) => console.error("Failed to fetch categories", error))
+      .finally(() => {
+        if (isActive) setIsLoaded(true);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   return (
     <section className="py-12 md:py-20 bg-gray-50 relative overflow-hidden">
@@ -52,7 +73,17 @@ export default async function Categories() {
           </p>
         </div>
 
-        {categories.length === 0 ? (
+        {!isLoaded && categories.length === 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" aria-label="Loading categories" aria-busy="true">
+            {Array.from({ length: 10 }, (_, index) => (
+              <div key={index} className="bg-white rounded-xl p-4 md:p-6 border border-gray-100 shadow-sm">
+                <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 rounded-xl bg-gray-200 animate-pulse" />
+                <div className="h-4 w-3/4 mx-auto mb-2 rounded bg-gray-200 animate-pulse" />
+                <div className="h-3 w-1/2 mx-auto rounded bg-gray-100 animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ) : categories.length === 0 ? (
           <div className="text-center text-gray-500 py-10">{t("noCategories")}</div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -62,8 +93,8 @@ export default async function Categories() {
                   <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 md:mb-4 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 relative">
          
                     <Image 
-                      src={category.image} 
-                      alt={category.name || "Category Image"} 
+                      src={category.image || "/placeholder.svg"} 
+                      alt={category.name?.[locale] || category.name?.en || "Category Image"} 
                       fill
                       sizes="(max-width: 768px) 64px, 80px"
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
@@ -73,10 +104,10 @@ export default async function Categories() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1 text-sm md:text-base line-clamp-2">
-                      {category.name}
+                      {category.name?.[locale] || category.name?.en || ""}
                     </h3>
                     <p className="text-[11px] md:text-xs text-gray-500">
-                      {category.subCategories?.length || 0} {t("subCategories")}
+                      {category.subCategoryCount || 0} {t("subCategories")}
                     </p>
                   </div>
                 </div>

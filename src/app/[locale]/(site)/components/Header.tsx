@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation"; 
 import { useTranslations, useLocale } from "next-intl";
+import { setSessionCache } from "@/lib/browserStorage";
 
 import {
   DropdownMenu,
@@ -103,9 +104,7 @@ const Header = ({ lightBackground = false, hideTopBar = false, categories: initi
         .then(data => {
           if (data && data.length > 0) {
             setCategories(data);
-            if (typeof window !== 'undefined') {
-              sessionStorage.setItem('categories', JSON.stringify(data));
-            }
+            setSessionCache("categories", data);
           }
         })
         .catch(err => {

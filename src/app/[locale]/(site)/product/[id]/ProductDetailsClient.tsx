@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ProductQuoteForm from "../../components/ProductQuoteForm";
 import { useLocale, useTranslations } from "next-intl"; 
+import { setSessionCache } from "@/lib/browserStorage";
 
 // Cloudinary Loader Function
 const cloudinaryLoader = ({ src, width }: { src: string, width: number }) => {
@@ -64,29 +65,40 @@ const ProductDetails = ({ params }: PageProps) => {
   const [subCatSlug, setSubCatSlug] = useState<string>("");
 
   useEffect(() => {
-    if (!productId) return; 
+    if (!productId) {
+      setLoading(false);
+      return;
+    }
 
     const fetchProductAndCategories = async () => {
+      let prodData;
       try {
         setLoading(true);
-        
-        // Product Fetch
         const prodRes = await fetch(`/api/products/${productId}`);
         if (!prodRes.ok) {
           throw new Error("Product not found");
         }
-        const prodData = await prodRes.json();
+        prodData = await prodRes.json();
         setProduct(prodData);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
 
-        // Category Fetch with Session Storage Caching (Makes it super fast)
+      if (!prodData) return;
+
+      try {
         let catData;
         const cachedCats = sessionStorage.getItem('categories');
         if (cachedCats) {
           catData = JSON.parse(cachedCats);
         } else {
           const catRes = await fetch(`/api/admin/categories`);
+          if (!catRes.ok) return;
           catData = await catRes.json();
-          sessionStorage.setItem('categories', JSON.stringify(catData));
+          setSessionCache("categories", catData);
         }
 
         if (catData.categories && prodData.category) {
@@ -105,10 +117,7 @@ const ProductDetails = ({ params }: PageProps) => {
           }
         }
       } catch (error) {
-        console.error("Error fetching product:", error);
-        setProduct(null);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching categories:", error);
       }
     };
 
